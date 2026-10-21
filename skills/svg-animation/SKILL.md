@@ -1,7 +1,7 @@
 ---
 name: svg-animation
 description: GSAP 3.15 paused timelines for step-through explainers.
-version: 1.0.0
+version: 1.1.0
 ---
 
 # SVG Animation with GSAP
@@ -12,7 +12,9 @@ This skill times a sequence; it does not decide what the sequence is worth. From
 `illustration-spec` bring three things: the step list (one idea per step), the answer
 to the enabling test (why the reader cannot infer the transition from statics), and
 the per-step labels. Statics are the default for causal processes; animation has to
-earn its place. Without a step list, a timeline is only motion.
+earn its place. Without a step list, a timeline is only motion. When parts move by a
+rule (a crank, a linkage, a curve that follows a slider), also bring section 9b, the
+mechanism and state model: the timeline animates its state variable, not the parts.
 
 GSAP **3.15.0** (released 2026-04-13) is the current version, and every bonus plugin
 (DrawSVG, MorphSVG, MotionPath, SplitText) has been **100% free since 3.13 (April 2025)**.
@@ -318,6 +320,45 @@ const tl = gsap.timeline({
   DrawSVG import `gsap/DrawSVGPlugin` was); registering plugins with `gsap.registerPlugin()`
   before use is standard GSAP practice.
 
+## Mechanisms: tween the state, not the parts
+
+Attribute tweens interpolate each attribute in a straight line between keyframes. A piston
+pinned to a crank does not move in a straight line between two crank angles, so a timeline
+that tweens `cy` from one keyframe to the next draws positions the mechanism never takes.
+Tween the state variable instead and let the model place every part. GSAP animates plain
+objects: the README lists `"generic objects... anything JavaScript can touch!"`
+(github.com/greensock/GSAP, 3.15.0, accessed 2026-10-21).
+
+```javascript
+// state lives in one object; render(theta) is the same function the slider and the
+// static figure call, so a paused frame and a scrubbed frame cannot disagree
+const state = { theta: 0 };   // degrees; datum: 0 = cylinder 1 at TDC, start of intake
+const cycle = gsap.timeline({ paused: true, onUpdate: () => render(state.theta) });
+
+cycle.addLabel("intake")
+  .to(state, { theta: 180, duration: 1, ease: "none" })    // constant crank speed
+  .addLabel("compression")
+  .to(state, { theta: 360, duration: 1, ease: "none" })
+  .addLabel("power")
+  .to(state, { theta: 540, duration: 1, ease: "none" })
+  .addLabel("exhaust")
+  .to(state, { theta: 720, duration: 1, ease: "none" });
+```
+
+- **`ease: "none"` for a driver that turns at constant speed.** `none` is GSAP's linear
+  core ease (gsap.com/docs/v3/Eases, accessed 2026-10-21). An eased crank reads as an
+  engine speeding up and slowing down every stroke; the parts already accelerate on their
+  own, because the model makes them.
+- **Labels sit at phase boundaries from 9b**, so Prev/Next lands on states the spec names
+  and a reviewer can force with a query parameter.
+- **The datum is stated once.** `render` owns the phase offsets for every part; the
+  timeline only moves `theta`. A second offset hidden in a tween is how two panels come to
+  disagree about which cylinder fires.
+- **Wrap in the model, not the tween.** Tween `theta` past 720 if the motion should run
+  on; `render` reduces it with `((theta % 720) + 720) % 720`, so the timeline never jumps.
+- `.set()` and `attr` tweens stay right for parts that are placed, not derived: a label that
+  appears at a step, a highlight that switches on.
+
 ## Caveats
 
 - **SplitText cannot split SVG text:** `"SplitText does not support SVG <text>."` Keep
@@ -344,6 +385,8 @@ const tl = gsap.timeline({
   is out of scope for the plugin.
 - **`.set()` for discrete steps, `attr` tweens for motion.** Zero-duration changes at label
   boundaries keep steps crisp.
+- **Mechanisms tween their state variable**, with `ease: "none"` for a constant-speed
+  driver, and `render(state)` places every derived part.
 
 ## See Also
 
