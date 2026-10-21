@@ -1,7 +1,7 @@
 ---
 name: illustration-spec
 description: Use when planning a 2D illustration before drawing.
-version: 1.2.0
+version: 1.3.0
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -9,7 +9,7 @@ metadata:
   hermes:
     tags: [illustration, planning, spec, composition, technical-drawing, diagram, requirements]
     category: creative
-    related_skills: [svg-explainer-layout, svg-geometry, svg-verify, svg-fundamentals]
+    related_skills: [spec-driven-development, svg-explainer-layout, svg-geometry, svg-verify, svg-fundamentals, svg-animation, svg-interaction]
 ---
 
 # Illustration Spec
@@ -26,6 +26,15 @@ Two paths:
 - **Fast path** (12 questions, minutes). One-off figures you will throw away.
 - **Full path** (the spec below). Anything published, presented, revised, reused, or
   handed to an agent in a later session.
+
+## Contents
+
+- **Plan:** decision spine, view map, fast path, full spec, mechanism and state model,
+  detail policy
+- **Audit the plan:** pre-approval checks, detail views, projection and numbers
+- **Build:** delegated agents, gate list
+- **Judge:** acceptance tests, rules with their standing, folklore, free parameters
+- **Connect:** handoff to the builder skills, failure modes, the SDD mapping, references
 
 ## When to use
 
