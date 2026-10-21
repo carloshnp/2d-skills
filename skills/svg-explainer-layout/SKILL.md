@@ -1,7 +1,7 @@
 ---
 name: svg-explainer-layout
 description: "HTML+SVG explainer pages: cards, tabs, traces, a11y."
-version: 1.0.0
+version: 1.1.0
 ---
 
 # SVG Explainer Layout
@@ -12,6 +12,9 @@ A page is a composition before it is a layout. From `illustration-spec` bring th
 figure inventory with one message per figure, the panel order and its justification,
 the reading entry point for each figure, and the acceptance test each figure must
 pass. A card grid organises figures that already have a job; it cannot supply the job.
+The view map supplies the page structure: views in reading order, what each depends on,
+and each view's element floor. At `detail: full` (the default), a view that needs height
+for its detail gets its own full-page tab rather than a band in a grid.
 
 ## Quick Start
 
@@ -165,6 +168,17 @@ whole viewport, instead of bands that cap how much any one view can hold.
   driven in a demo or by a scripted check.
 - **Caption per tab.** No two views are ever seen together, so each tab carries its own
   scale and its own reading; a header caption carries only the figure's message.
+- **Shared defs outside the tabs.** A pattern, gradient, marker, or clip path defined inside
+  a `display:none` tab paints nothing anywhere else, and a duplicated id resolves to the
+  first copy even when it is hidden. Inject shared defs once into a zero-size visible SVG
+  before the tabs mount (`svg-defs`, Defs across several SVGs). In one five-tab build the
+  same hatch pattern was injected into every tab, and the one tab that used it rendered its
+  section unhatched while every audit passed.
+- **Element floor per tab, from the view map.** The audit counts descendants of each tab's
+  SVG (`querySelectorAll("*").length`) against its floor, so a tab that comes back simpler
+  after a rewrite fails a number instead of passing a glance.
+- **Tab letters in reading order**, matching the view map, so "tab C" means the same view in
+  the spec, the harness, and the review notes.
 
 ## Accessibility and text-first typography
 
