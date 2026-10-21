@@ -135,6 +135,7 @@ Then one line: MESSAGE = the sentence a reader should repeat.
 - READING CONTEXT: slide, paper column, dashboard, phone; neighbours on the page
 - REPRODUCTION: width x height, aspect, final display size, print or screen
 - LIFETIME: one talk, one paper, an illustration system
+- ASSUMPTIONS: numbered, each marked confirmed or corrected by the requester
 
 ## 3. Goals and non-goals
 - GOAL-1..n: one observable outcome each
@@ -153,6 +154,7 @@ Then one line: MESSAGE = the sentence a reader should repeat.
 - detail: full (default) | reduced. reduced names what is dropped and why; "the
   requester asked for a simple figure" is a reason, "it was faster" is not
 - element floor: per view, in the view map; the harness fails any view below it
+- boundaries: Always <...> / Ask first <...> / Never <...>
 
 ## 5. Visual system lock
 - projection: <declared, one per sheet, never mixed>
@@ -166,6 +168,7 @@ Then one line: MESSAGE = the sentence a reader should repeat.
 - value plan: <3 foundation values; where the highest light/dark junction sits>
 - light: <one direction, one shadow type, or "flat, no light declared">
 - detail floor: nothing meaningful below <px> at final size
+- style reference: <path to one rendered frame that is the style source>
 
 ## 6. Content inventory
 Views first (one row per view, see View map), then elements.
@@ -212,6 +215,8 @@ keeps both.
   cannot infer the transition from statics
 - ids and classes: DOM ids equal inventory IDs; one class per visual role
 - verification hooks: which state can be forced by query param
+- commands: render, verify, and sweep, with flags, so a later session can reproduce
+  every state a reviewer saw
 
 ## 9b. Mechanism and state model
 Required when any position, visibility, or label is derived from a state.
@@ -414,6 +419,58 @@ For technical figures insert a gate between G3 and G4: **factual accuracy**. No
 professional illustration workflow has this gate, and an explainer without it is
 unverified by construction. Check every number, unit, phase label, and micrograph
 attribution against a primary source before styling begins.
+
+## Adapted from spec-driven development
+
+This skill is the 2D instance of `spec-driven-development`. Its phases map onto the gates
+so the two never read as competing workflows:
+
+| SDD phase | Here | Human reviews |
+|---|---|---|
+| 0 Scope check, capability map | view map | views, dependencies, build order |
+| 1 Specify | spine 1 to 7; spec sections 1 to 8 and 9b; G0 | the spec, in a later turn |
+| 2 Plan | G1 thumbnails, G2 value, section 9 build contract | the chosen concept |
+| 3 Tasks | one module per view, the contract file | the contract |
+| 4 Implement | G3 rough, factual accuracy, G4 build | each gate |
+| Verification | G5 acceptance and state sweep | non-author reviewer |
+
+Carried over, rewritten for figures:
+
+- **Surface assumptions before the spec.** List them and ask for corrections:
+  `1. third-angle projection 2. seen on a 1920x1080 projector 3. audience knows the
+  four-stroke cycle 4. detail: full`. An unstated assumption becomes a composition
+  decision nobody approved.
+- **Reframe vague asks as checks.** "Make it more detailed" becomes an element floor per
+  view, a shell and oil hole on every bearing, and every leader ending on a named part.
+  "Make it pop" becomes a value junction at the dominant element, read in grayscale.
+- **Boundaries in three tiers**, in section 4. Always: run the harness before reporting,
+  patch rather than regenerate. Ask first: dropping approved detail, changing projection,
+  adding or removing a view, changing the aspect ratio. Never: an unsourced number, colour
+  as the only carrier of meaning, editing a frozen view without a revision row.
+- **Commands belong in the spec.** Section 9 names render, verify, and sweep commands with
+  their flags (`verify.py`, `index.html?tab=C&angle=90&audit=1`).
+- **One reference frame beats three paragraphs of style**, the way a code spec points at
+  one real snippet instead of describing conventions.
+- **Stop after the spec.** Present it with its open questions and end the turn.
+  Thumbnails start after approval.
+- **Keep it alive.** A decision that changes mid-build edits the spec first, with a
+  revision row, then the drawing. A requirement added during build with no acceptance
+  row is the usual way this breaks, and `check_spec.py` catches it.
+
+| Rationalization | Reality |
+|---|---|
+| "It's just a diagram" | A diagram makes claims and needs a dominant element. A twenty-line spec is enough. |
+| "I'll compose it after drawing the parts" | That is layout. The reading path decides which parts are drawn large. |
+| "The requester knows what they want" | A precise brief still leaves projection, audience, and size open. |
+| "Detail can come later" | Detail added after composition fights it. Plan the floor first. |
+| "A review note means start over" | It means patch the feature it names. Regenerating discards the costliest work. |
+| "One frame looks right" | One frame is one sample of the mechanism. Sweep the states. |
+| "The audit is green" | A DOM audit checks presence, not projection or meaning. Look at every state. |
+
+Red flags: drawing before section 1 has a MESSAGE line; a view with no row in the view
+map; a requirement with no acceptance row; moving parts with no section 9b; a redraw
+whose element count fell; a number with no ledger row; thumbnails started in the turn the
+spec was presented.
 
 ## Acceptance tests
 
