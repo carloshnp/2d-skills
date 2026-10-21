@@ -1,7 +1,7 @@
 ---
 name: svg-interaction
 description: "Direct SVG DOM interaction: steps, scrubbers, sliders."
-version: 1.0.0
+version: 1.1.0
 ---
 
 # SVG Interaction
@@ -12,7 +12,9 @@ Interaction is a reading decision, not a feature. From `illustration-spec` bring
 reading task, the step list (one idea per step), and whether interaction is needed at
 all: if a static figure answers the question, controls only add load. Every control
 should trace to a requirement in the spec, and the step count should trace to the
-mechanism's action points.
+mechanism's action points. When the figure is a mechanism, section 9b names the state
+variable, its range, its datum, and its named states; the controls are bound to exactly
+that.
 
 Inline SVG gives you something canvas does not: every shape is a real DOM node with its own
 events, text and accessibility. You do not project a pointer into a scene graph or run a
@@ -196,6 +198,46 @@ Rules that keep this safe and smooth:
   `resample()` → redraw), TensorFlow Playground's hyperparameter sliders, Setosa's Markov
   chain probabilities, and Transformer Explainer's temperature/top-k controls.
 
+## Controls Bound to the State Variable
+
+A step index is one shape of state. A mechanism usually has a continuous one (crank
+angle, time, a parameter) with named states inside it. Either way the control is a view
+of the spec's state variable, never a second source of truth.
+
+```javascript
+// shell owns the state; panels only render it
+const STATE = { min: 0, max: 719, step: 1, initial: 90 };          // from spec 9b
+const q = new URLSearchParams(location.search);
+let theta = clampWrap(Number(q.get("angle") ?? STATE.initial));
+let tab = q.get("tab") ?? "A";
+
+const slider = document.getElementById("crankAngle");              // min/max/step from STATE
+slider.addEventListener("input", () => { theta = Number(slider.value); render(); });
+document.addEventListener("keydown", (e) => {
+  const d = { ArrowRight: 1, ArrowLeft: -1, PageUp: 90, PageDown: -90 }[e.key];
+  if (d) { theta = clampWrap(theta + d); render(); e.preventDefault(); }
+});
+function clampWrap(t) { return ((t % 720) + 720) % 720; }           // cyclic: wrap, not clamp
+function render() {
+  slider.value = theta;
+  readout.textContent = `${theta} deg, ${phaseName(theta)}`;       // units and named state
+  PANELS[tab].render({ theta });
+}
+```
+
+- **Range, step, and default come from 9b.** A slider whose `max` is 360 on a 720-degree
+  cycle silently hides half the mechanism.
+- **Cyclic state wraps, bounded state clamps.** Arrow keys past 719 return to 0.
+- **Step by the mechanism's natural interval too.** Fine steps for inspection (1 degree)
+  and a coarse key for the named interval (90 degrees, one firing apart in a V8), so a
+  reader can walk the named states without dragging.
+- **The readout shows the state in the spec's units and the named phase**, so a screenshot
+  records which state it shows.
+- **State lives in the shell, not in a view.** Switching tabs re-renders the new view from
+  the same state; a view that keeps its own copy will disagree after the first switch.
+- **Every state is reachable by URL** (`?tab=C&angle=90`). The harness, the reviewer, and
+  a bug report all name states the same way. `svg-verify` relies on it.
+
 ## Per-Node Listeners
 
 Because the marks are DOM nodes, attach listeners directly to them. There is no hit-test pass
@@ -282,6 +324,8 @@ For static steppers, pick representative mid-stroke poses whose consecutive orde
   `prev()`/`next()`/Play-Pause so the stepper is usable without a pointer.
 - **Attribute-only writes.** Mutate `d`, `cx`/`cy`, `r`, `transform`, `opacity`,
   `stroke-width`; never reassign `innerHTML`.
+- **Shared state across views.** One state object in the shell, read from the URL on load,
+  rendered into whichever tab is active; controls write it, views only read it.
 
 ## Field notes (defaults, not laws)
 - The Quick Start stepper is ONE working implementation. Keep its invariants
