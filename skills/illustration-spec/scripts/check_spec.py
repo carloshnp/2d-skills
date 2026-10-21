@@ -7,7 +7,11 @@ Checks
   2. no banned adjectives inside requirement text
   3. counts stated in prose match the tables they describe (elements, colours)
   4. no em or en dashes
-  5. section 9b, when present, states STATE, DATUM, and at least one INV-nn
+  5. requirement standing: [MUST-STANDARD], [MUST-LOCAL] or [SHOULD]; plain [MUST]
+     is accepted with a warning
+  6. section 4 declares detail: full | reduced; section 6 gives every view a numeric
+     element floor
+  7. section 9b, when present, states STATE, DATUM, and at least one INV-nn
      invariant, or says "none"
 
 Usage
@@ -103,11 +107,17 @@ def main(path):
         fails.append("no '## 7. Requirements' section found")
     else:
         for offset, ln in enumerate(lines[block[0]:block[1]]):
-            m = re.match(r"^-\s+(REQ-[A-Za-z0-9]+-\d+)\s+\[(MUST|SHOULD)\]", ln)
+            m = re.match(
+                r"^-\s+(REQ-[A-Za-z0-9]+-\d+)\s+\[(MUST-STANDARD|MUST-LOCAL|MUST|SHOULD)\]", ln)
             if m:
                 reqs.append((block[0] + offset + 1, m.group(1), m.group(2)))
         if not reqs:
-            fails.append("section 7 has no lines matching '- REQ-<id> [MUST|SHOULD]'")
+            fails.append("section 7 has no lines matching '- REQ-<id> [MUST-STANDARD|MUST-LOCAL|SHOULD]'")
+        legacy = [r for r in reqs if r[2] == "MUST"]
+        if legacy:
+            warns.append("%d requirements tagged plain [MUST]; give each a standing "
+                         "(MUST-STANDARD or MUST-LOCAL), first at line %d"
+                         % (len(legacy), legacy[0][0]))
 
     accepted = []
     block = sections.get(10)
@@ -188,7 +198,33 @@ def main(path):
         if "\u2014" in ln or "\u2013" in ln:
             fails.append("line %d: em or en dash" % i)
 
-    # 5. mechanism section
+    # 6. detail policy and element floors
+    block = sections.get(4)
+    if block and not any(re.match(r"^-\s+detail:\s*(full|reduced)\b", ln.strip(), re.I)
+                         for ln in lines[block[0]:block[1]]):
+        warns.append("section 4 has no '- detail: full | reduced' line; full is assumed")
+    block = sections.get(6)
+    if block:
+        floor_col = None
+        seen_header = False
+        for line_no, cells in table_cells(lines, block[0], block[1]):
+            low = [c.lower() for c in cells]
+            if "element floor" in low:
+                floor_col = low.index("element floor")
+                seen_header = True
+                continue
+            if low and low[0] == "id":
+                floor_col = None  # header of the element inventory: views are done
+                continue
+            if floor_col is None or not cells or low[0] == "view":
+                continue
+            val = cells[floor_col] if floor_col < len(cells) else ""
+            if not val.isdigit():
+                fails.append("line %d: view %s has no numeric element floor" % (line_no, cells[0]))
+        if not seen_header:
+            warns.append("section 6 has no view table with an 'element floor' column")
+
+    # 7. mechanism section
     block = sections.get("9b")
     if block is None:
         warns.append("no '## 9b. Mechanism and state model': confirm nothing is derived")

@@ -30,7 +30,7 @@ Two paths:
 ## Contents
 
 - **Plan:** decision spine, view map, fast path, full spec, mechanism and state model,
-  detail policy
+  detail policy (default `full`)
 - **Audit the plan:** pre-approval checks, detail views, projection and numbers
 - **Build:** delegated agents, gate list
 - **Judge:** acceptance tests, rules with their standing, folklore, free parameters
@@ -69,16 +69,18 @@ most common cause of an illustration that is beautiful and says nothing.
 Name the views before inventorying their elements, the way a software spec names its
 modules before specifying any of them. The view map is section 6's first table.
 
-| view | job in the argument | depends on |
-|---|---|---|
-| A | <what this view proves that no other view can> | none |
-| B | <...> | A |
+| view | job in the argument | depends on | element floor |
+|---|---|---|---|
+| A | <what this view proves that no other view can> | none | <n> |
+| B | <...> | A | <n> |
 
 - A view with no job is deleted, not shrunk into a corner of another view.
 - A view that depends on another is drawn after it, shares its unit scale, and names its
   parent in the caption, because the reader never sees the two side by side.
 - Views with no dependency between them can be built in parallel, one agent each. The
   view map is the work breakdown for a delegated build.
+- The element floor is the minimum live element count the view must reach (see Detail
+  policy). Set it from the inventory, not from a finished drawing.
 
 ## Fast path: thirteen questions
 
@@ -148,6 +150,9 @@ Then one line: MESSAGE = the sentence a reader should repeat.
 - convention: <none | orthographic first/third angle | axonometric isometric |
   flat schematic | map-like>
 - time appetite: how much effort this deserves before it is over-engineered
+- detail: full (default) | reduced. reduced names what is dropped and why; "the
+  requester asked for a simple figure" is a reason, "it was faster" is not
+- element floor: per view, in the view map; the harness fails any view below it
 
 ## 5. Visual system lock
 - projection: <declared, one per sheet, never mixed>
@@ -165,8 +170,8 @@ Then one line: MESSAGE = the sentence a reader should repeat.
 ## 6. Content inventory
 Views first (one row per view, see View map), then elements.
 
-| view | job in the argument | depends on |
-|------|---------------------|------------|
+| view | job in the argument | depends on | element floor |
+|------|---------------------|------------|---------------|
 
 | ID | element | job in the argument | must show | budget | label | convention |
 |----|---------|---------------------|-----------|--------|-------|------------|
@@ -175,11 +180,19 @@ Every element carries a job. An element without a job is deleted, not shrunk.
 IDs become DOM ids (VIZ-<ID>) so acceptance tests can assert them.
 
 ## 7. Requirements
-- REQ-FIG-01 [MUST] <checkable statement>
-- REQ-FIG-02 [SHOULD] <checkable statement, with the cost of complying>
+- REQ-FIG-01 [MUST-STANDARD] <checkable statement> (source: <document, clause>)
+- REQ-FIG-02 [MUST-LOCAL] <checkable statement> (why: <the decision it records>)
+- REQ-FIG-03 [SHOULD] <checkable statement, with the cost of complying>
 
 Banned adjectives in requirements: clear, clean, modern, professional, appealing,
 balanced, readable (say what makes it so, measurably).
+
+Standing decides what can be traded. MUST-STANDARD comes from a document (ISO, WCAG,
+a venue's figure guide) and is never traded; it is met by patching the offending
+feature, never by deleting approved detail around it. MUST-LOCAL is a decision made
+for this figure and is tradeable. When applying any requirement would delete content
+already approved, stop and ask: show the rule, what it removes, and an option that
+keeps both.
 
 ## 8. Composition plan
 - DOMINANT: the one element seen first
@@ -262,6 +275,22 @@ reports the first failing state. A mechanism checked at one frame is unreviewed.
 Static, animated, and interactive versions share one model. Draw the static figure by
 calling the function the slider calls, so the frozen frame and the live one cannot
 disagree. `references/build-harness.md` carries the sweep.
+
+## Detail policy
+
+`detail: full` is the default. A figure is drawn at the detail its subject has, not the
+detail that was quick to produce, unless the requester asked for a simple figure.
+`reduced` is legitimate when it is stated in section 4 with what is dropped.
+
+Three rules hold the default in place, because each failure below happened in one build:
+
+- **Element floor per view (MUST).** Written in the view map, asserted by the harness.
+  A node budget is a ceiling and cannot see a view getting simpler; a floor turns a
+  thinner redraw into a failing number instead of a passing glance.
+- **Patch, never regenerate, to answer a requirement.** A projection requirement was
+  answered by regenerating two detailed views from the brief. Both came back at about a
+  third of their source length, and the requester restored the originals.
+- **No requirement silently deletes approved content.** Escalate instead (section 7).
 
 ## Before you present a spec for approval
 
