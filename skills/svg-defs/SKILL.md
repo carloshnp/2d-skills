@@ -1,7 +1,7 @@
 ---
 name: svg-defs
 description: "SVG defs boilerplate: markers, gradients, masks, filters."
-version: 1.0.0
+version: 1.1.0
 ---
 
 # SVG Defs and Reusable Resources
@@ -12,7 +12,9 @@ From `illustration-spec` bring the palette table (roles plus hex, one row per co
 and the arrow semantics. In a spec, an arrow claims movement, transformation,
 causation or sequence, never decoration or emphasis, so each marker in `<defs>` should
 map to one declared meaning. Filters are the one place faithful rendering is not
-assumed: `feGaussianBlur` has already broken headless capture here.
+assumed: `feGaussianBlur` has already broken headless capture here. Bring the view map
+too: when several SVGs share one page (panels, tabs), decide where shared defs live before
+any panel mounts (see Defs across several SVGs).
 
 `<defs>` holds SVG resources that are not rendered on their own; they paint only when
 referenced by `url(#id)` from an attribute (`fill`, `stroke`, `marker-end`, `clip-path`,
@@ -237,6 +239,36 @@ markup:
   **UNVERIFIED**.
 - Animating text splits? `SplitText does not support SVG <text>.` (R3); plan around it.
 
+## Defs across several SVGs on one page
+
+`url(#id)` resolves against the whole document, not the SVG that uses it. That makes
+shared defs possible and makes their placement a correctness decision. Measured in
+Chromium 154 (headless, 2026-10-21), one pattern, three placements:
+
+| Where the pattern is defined | Result in a visible SVG |
+|---|---|
+| only in an SVG inside a `display: none` parent | paints nothing |
+| in a hidden SVG first and in the visible SVG too (same id) | paints nothing: the first match wins, and it is hidden |
+| in a visible zero-size SVG | paints |
+
+WebKit bug 243341 reports the same family of failure through `<use>`: `"if the referenced
+SVG is inside a display: none parent, then the stroke will render correctly but the fill
+will not"`, and notes masks and clip paths fail too; it reports Firefox rendering
+correctly. Test the browsers the spec names.
+
+- **MUST: one host for shared defs.** A zero-size visible SVG at the top of the body,
+  injected once before any panel mounts:
+  `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>...</defs></svg>`.
+  Never inside a tab, panel, or step that can be `display: none`.
+- **MUST: ids unique in the document.** Per-panel defs take a panel prefix (`pB-hatch`).
+  A duplicate id is a defect even when the active view happens to look right.
+- **Verify by pixels, not tokens.** In one five-tab build the shell injected the same
+  hatch pattern into every tab's SVG. The tab that used it rendered its section with no
+  hatching while the harness passed, because the harness checked that the `hatch` class
+  existed.
+  Moving the pattern to one host changed 9,540 pixels inside the hatched region of the
+  affected tab and none elsewhere. `svg-verify` covers the pixel check.
+
 ## Support Matrix
 
 R4's feature matrix, condensed (Two.js **0.8.24**, SVG.js **3.2.8**, hand-written inline
@@ -305,7 +337,8 @@ still shows **3.2.6 (2026-07-17)** as "Latest"; trust npm for the newest publish
 
 - **One `<defs>` per figure**, at the top of the SVG, referenced with `url(#id)`.
 - **Prefix ids** (`#myfig-arrow`) when several SVGs share a page: colliding ids make every
-  reference resolve to the first match (standard SVG; **UNVERIFIED** against R4).
+  reference resolve to the first match, and a hidden first match paints nothing (measured
+  in Chromium 154; see Defs across several SVGs).
 - **Arrowheads** are a marker + `orient="auto"`; the connector curve that carries them is
   in `svg-geometry`.
 - **Pick the resource by edge quality:** gradient = painted fill, `clipPath` = hard cut,
