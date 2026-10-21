@@ -1,6 +1,7 @@
 ---
 name: svg-d3-charts
 description: D3 7.9.0 data binding for SVG explainers and charts.
+version: 1.0.0
 ---
 
 # D3 SVG Charts
@@ -88,7 +89,7 @@ The modules this skill uses, and their last release, are:
 | d3-shape | 3.2.0 | 2022-12-20 |
 
 - 7.9.0's headline addition was **`d3.schemeObservable10`** (a categorical colour scheme).
-- Post-7.9.0 commits to the core repo are documentation/link fixes only — no source changes.
+- Post-7.9.0 commits to the core repo are documentation/link fixes only; no source changes.
 
 ```bash
 npm i d3@7.9.0
@@ -108,7 +109,7 @@ not checked in any source report; prefer npm/bundler pinning.
 ## Selections and Joins
 
 `join()` collapses the enter/update/exit dance into one call. Use a **key function** so
-nodes keep identity across updates — without it D3 binds by index and transitions restart.
+nodes keep identity across updates; without it D3 binds by index and transitions restart.
 
 ```javascript
 function update(newData) {
@@ -139,15 +140,15 @@ A scale maps data space to pixel space. `scaleLinear` is the workhorse for quant
 
 ```javascript
 const x = d3.scaleLinear().domain([0, 100]).range([0, 480]);
-x(50);          // 240  — data -> pixel
-x.invert(240);  // 50   — pixel -> data (needed for pointer math)
+x(50);          // 240: data -> pixel
+x.invert(240);  // 50: pixel -> data (needed for pointer math)
 
 const axis = d3.axisBottom(x).ticks(5).tickSizeOuter(0);
 svg.append("g").attr("transform", "translate(0,200)").call(axis);
 ```
 
 - Use `d3.axisBottom`/`d3.axisLeft` for x/y ticks; call the axis generator on a `<g>`.
-- `x.invert()` converts a pointer coordinate back to a data value — pair it with the
+- `x.invert()` converts a pointer coordinate back to a data value; pair it with the
   pointer-to-viewBox conversion from `svg-interaction`.
 - The other scales (`scaleBand` for categories, `scaleTime`, `scaleLog`, …) live in the same
   `d3-scale` module and follow the same `domain`/`range` shape.
@@ -179,7 +180,7 @@ svg
 ## Drag and Zoom Behaviors
 
 `d3-zoom` and `d3-drag` attach gesture handlers to SVG elements and hand you coordinates in
-user units — no manual hit-testing required.
+user units; no manual hit-testing required.
 
 ```javascript
 // Pan + wheel/pinch zoom on a group.
@@ -243,7 +244,7 @@ R2's per-library verdicts, for LLM-generated interactive explainers:
 | Apache ECharts | 6.1.0 (2026-05-19) | Yes, opt-in | canvas | Rich built-in components (tooltip, legend, dataZoom) |
 | Vega-Lite | 6.5.0 (2026-10-08) | Yes, configurable | contested | A declarative JSON spec; grammar fills in scales/axes |
 
-**Observable Plot — one-liner SVG figures.** Returns a *detached* DOM element (an SVG or an
+**Observable Plot: one-liner SVG figures.** Returns a *detached* DOM element (an SVG or an
 HTML `<figure>`) that you append yourself:
 
 ```javascript
@@ -255,7 +256,7 @@ const figure = Plot.plot({
 document.querySelector("#chart-wrap").append(figure);
 ```
 
-**ECharts — richest components, SVG is opt-in and the bundle is large (~60 MB unpacked).**
+**ECharts: richest components, SVG is opt-in and the bundle is large (~60 MB unpacked).**
 Canvas is the recommended default, and some effects fall back to canvas:
 
 ```javascript
@@ -267,7 +268,7 @@ chart.setOption({ xAxis: { type: "category", data: ["A", "B", "C"] }, yAxis: {},
 With tree-shakable imports you must import the SVG renderer yourself. **UNVERIFIED:** the
 exact import path for the tree-shakable SVG renderer was not quoted in the source reports.
 
-**Vega-Lite — declarative, but set the renderer explicitly.** vega-embed's README calls `svg`
+**Vega-Lite: declarative, but set the renderer explicitly.** vega-embed's README calls `svg`
 the default while Vega core documents `canvas` as the default, so do not rely on the default:
 
 ```javascript
@@ -297,7 +298,7 @@ Vega *signals*, which is more indirect than D3 or ECharts.
 ## Field notes (defaults, not laws)
 - MUST: mark ONLY sourced numbers, and state the schematic-vs-measured
   convention in the caption with the source. Never invent curve points to
-  fill a series — a hedged fabrication still propagates.
+  fill a series: a hedged fabrication still propagates.
 - DEFAULT: log time axis with Catmull-Rom smoothing through anchors; verify
   dot-on-curve coincidence numerically (`--dump-dom`), not by eye. Other
   honest presentations (step plots, annotated points without curves) are fine.
