@@ -1,6 +1,7 @@
 ---
 name: svg-interaction
 description: "Direct SVG DOM interaction: steps, scrubbers, sliders."
+version: 1.0.0
 ---
 
 # SVG Interaction
@@ -15,7 +16,7 @@ mechanism's action points.
 
 Inline SVG gives you something canvas does not: every shape is a real DOM node with its own
 events, text and accessibility. You do not project a pointer into a scene graph or run a
-raycaster — you attach a listener to the node, or read the pointer in the figure's own
+raycaster: you attach a listener to the node, or read the pointer in the figure's own
 `viewBox` units. This skill covers the interaction layer for HTML + inline-SVG explainers:
 a **step index** driving one `renderStep()`, Play/Pause/Prev/Next controls, a scrubber, and
 range-slider parameters that update SVG attributes.
@@ -105,7 +106,7 @@ scrubber, and a radius slider that writes an SVG attribute.
 
 ## Step State: One Index, One renderStep()
 
-Make a single integer the source of truth. One function — `renderStep()` — is the only thing
+Make a single integer the source of truth. One function, `renderStep()`, is the only thing
 that touches the DOM, and every control merely changes the index and calls it.
 
 ```javascript
@@ -126,7 +127,7 @@ This is the pattern shipped by the reference explainers:
 - **Distill's t-SNE** article pairs a `<button class="play-pause">` with a
   `#tray-steps-display` step counter.
 - **Scrollama** stores step identity in markup (`<div class="step" data-step="a">`) and fires
-  `onStepEnter`, i.e. step identity — not imperative drawing — drives rendering. The
+  `onStepEnter`, i.e. step identity, not imperative drawing, drives rendering. The
   `data-step` attribute is optional bookkeeping but useful for linking clicks to indices.
 
 Why one render path: Play, Prev/Next and the scrubber all funnel through `renderStep()`, so
@@ -135,7 +136,7 @@ drawing routine.
 
 ## Play/Pause/Prev/Next + Scrubber
 
-Bind the scrubber directly to `step` and call `renderStep()` — no separate render path.
+Bind the scrubber directly to `step` and call `renderStep()`; no separate render path.
 
 ```javascript
 const scrub = document.getElementById("scrub");
@@ -163,7 +164,7 @@ plain timer is enough for discrete steps.
 > scrubber* (a range input over step indices) was **not found** in any shipped explainer it
 > opened. The nearest verified substitutes were an integer `type="range"` used as a state
 > selector (Transformer Explainer) and a step counter (Distill t-SNE). So this scrubber
-> wiring is authored from those primitives — treat it as a starting point, not a quote.
+> wiring is authored from those primitives; treat it as a starting point, not a quote.
 
 Accessibility details worth keeping: give each button an `aria-label`, mark decorative SVGs
 `aria-hidden="true"`, and give the figure `role="img"` with a descriptive label.
@@ -171,7 +172,7 @@ Accessibility details worth keeping: give each button an `aria-label`, mark deco
 ## Range-Slider Parametric Updates
 
 A range slider writes a parameter; a handler recomputes the model; the result is pushed into
-SVG **attributes** (`d`, `cx`/`cy`, `transform`, `opacity`, `stroke-width`) — never by
+SVG **attributes** (`d`, `cx`/`cy`, `transform`, `opacity`, `stroke-width`); never by
 rebuilding the markup string.
 
 ```javascript
@@ -189,7 +190,7 @@ noise.addEventListener("input", () => {       // "input", not "change", tracks c
 Rules that keep this safe and smooth:
 
 - Listen to `input` so the SVG updates while the thumb is dragged.
-- Keep the model pure — `f(params) -> geometry` — and write attributes only as the last step.
+- Keep the model pure (`f(params) -> geometry`) and write attributes only as the last step.
 - Clamp in HTML (`min`/`max`/`step`) so the JS needs no validation.
 - This is the shape used by Distill's Gaussian-process figures (`updateSlider()` →
   `resample()` → redraw), TensorFlow Playground's hyperparameter sliders, Setosa's Markov
@@ -218,7 +219,7 @@ function toSvgPoint(svg, event) {
 }
 ```
 
-Never mix CSS pixel coordinates with user units — convert at the boundary and keep all
+Never mix CSS pixel coordinates with user units; convert at the boundary and keep all
 simulation logic in `viewBox` units. (`createSVGPoint()` is the older equivalent; prefer
 `DOMPoint` for new code.)
 
@@ -248,7 +249,7 @@ Inline SVG and canvas live on opposite sides of a trade-off:
 | | Inline SVG | Canvas |
 |---|---|---|
 | Interaction | Native per-node `addEventListener` | Manual hit-testing (project pointer, then test geometry) |
-| Text | Real `<text>` — searchable, selectable, readable by AT | Painted pixels; needs a parallel DOM overlay |
+| Text | Real `<text>`: searchable, selectable, readable by AT | Painted pixels; needs a parallel DOM overlay |
 | Setup | No raycaster, no scene-graph pick pass | A picking layer or a raycaster-style test |
 
 MDN states plainly that "Canvas content is not exposed to accessibility tools as semantic
@@ -283,8 +284,8 @@ For static steppers, pick representative mid-stroke poses whose consecutive orde
   `stroke-width`; never reassign `innerHTML`.
 
 ## Field notes (defaults, not laws)
-- The Quick Start stepper is ONE working implementation. Keep its invariants —
-  single state index, one render function, controls only mutate the index —
+- The Quick Start stepper is ONE working implementation. Keep its invariants
+  (single state index, one render function, controls only mutate the index)
   and redesign the surface freely: per-tab steppers, scroll-driven progress,
   keyboard-first, or something better. Same purpose, better form, wins.
 - Full-scene steps: exclusive reveal with opacity 0 for inactive scenes.
