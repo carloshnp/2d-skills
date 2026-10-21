@@ -1,6 +1,7 @@
 ---
 name: svg-verify
 description: Headless screenshot verification for SVG explainers.
+version: 1.0.0
 ---
 
 # SVG Explainer Verification
@@ -16,7 +17,7 @@ one check here. A requirement with no test is not a requirement.
 Adapted from the `threejs-viz-delivery` loop (used for WebGL scenes) to inline-SVG
 explainer pages: serve over HTTP, capture headless Chromium screenshots with
 state-forcing query params, syntax-check inline scripts, review with binary vision
-questions, and assert DOM state — the SVG analogue of pixel checks.
+questions, and assert DOM state: the SVG analogue of pixel checks.
 
 ## Quick Start
 
@@ -45,7 +46,7 @@ chromium --headless=new --dump-dom \
    (`--enable-unsafe-swiftshader --use-angle=swiftshader`) are unnecessary for plain 2D SVG;
    keep `--headless=new --no-sandbox --window-size=1600,1000 --hide-scrollbars
    --virtual-time-budget=6000 --screenshot=…`.
-2. **Bake state-forcing query params into the page** (`?still=1`, `?step=N` — the DIY
+2. **Bake state-forcing query params into the page** (`?still=1`, `?step=N`, the DIY
    rewrite of the 3D loop's `still=1`, `view=`, `steady=`). Captures are only deterministic
    if the page honours them before rendering.
 3. **Syntax-check before every capture:** extract each inline `<script>` (or
@@ -58,15 +59,15 @@ chromium --headless=new --dump-dom \
    Open-ended asks ("describe this") invite confabulation. Ask pointed follow-ups against
    prior claims: vision reviewers anchor on their own earlier descriptions and report
    imaginary details (labels, colors, arrows) as fact.
-6. **Settle disputes with DOM assertions** — the SVG analogue of the 3D loop's pixel
+6. **Settle disputes with DOM assertions**: the SVG analogue of the 3D loop's pixel
    measurements (see below).
 7. **Rewrites go to a NEW file,** verified by capture, then moved over the original;
    targeted edits use patch. Never delete the last-known-good file before its replacement
    is verified. Deliver the verified file to its durable destination path in the same
-   session — scratch and cache dirs are pruned and must never hold the only copy.
+   session: scratch and cache dirs are pruned and must never hold the only copy.
 8. **Ground explainer facts in sourced research notes** before drawing them. Tag every
    unpublished or inferred value as unverified and never bake guessed numbers into visible
-   labels — SVG `<text>` is real text, so a wrong label reads as fact in every capture.
+   labels: SVG `<text>` is real text, so a wrong label reads as fact in every capture.
 
 ## State-forcing query params
 
@@ -96,7 +97,7 @@ chromium --headless=new --dump-dom "…?step=2&still=1" > dom-step2.html
 ```
 
 ```javascript
-// assert-state.mjs — compare selector counts and attribute values across states.
+// assert-state.mjs: compare selector counts and attribute values across states.
 import { readFileSync } from "node:fs";
 const dom = readFileSync(process.argv[2], "utf8");
 const count = (re) => (dom.match(re) ?? []).length;
@@ -111,13 +112,13 @@ const t = dom.match(/transform="translate\(([^)]*)\)"/g); // read attribute valu
   across `step=N` captures.
 - **Mirrors the 3D noise-floor rule:** if an attribute is unchanged after a real
   geometry edit, the render is fine and the vision reviewer is anchoring on its own
-  earlier description — no measured signal means the render is fine and the reviewer wrong.
+  earlier description; no measured signal means the render is fine and the reviewer wrong.
 - `--dump-dom` and the regex-count style are **UNVERIFIED** in the source reports (a
   standard headless-Chromium capability of the same binary the verified screenshot
   command uses); the *measure-instead-of-argue* rule itself is verified practice.
 - **When the claim is raster-only** (font metrics, gradient smoothness, antialiasing),
-  use the 3D loop's pixel tool: `threejs-viz-delivery`'s
-  `scripts/verify-screenshot.py` (`python3 verify-screenshot.py shot.png --crop
+  use the 3D loop's pixel tool from the `threejs-viz-delivery` skill,
+  `~/.hermes/skills/threejs-viz-delivery/scripts/verify-screenshot.py` (`python3 verify-screenshot.py shot.png --crop
   x0,y0,x1,y1 --bins …`): mean RGB for color-cast claims, FFT bin magnitudes for
   periodic-structure claims; bins are content-specific (e.g. dash-spacing frequency).
 
@@ -155,9 +156,9 @@ measures the visible tab. Loop the matrix and force the tab through a query para
 - **Anchoring defence:** when vision repeats a defect across real edits, dump DOM /
   measure pixels before editing again. When vision quotes a specific string
   ("the label reads X", "the button is empty"), grep the dumped DOM for that
-  string first — reviewers invent plausible labels and miss rendered text, and a
+  string first: reviewers invent plausible labels and miss rendered text, and a
   present-in-DOM string needs no edit.
-- **Never trust a blank capture:** run `node --check` first — blank SVG areas are script
+- **Never trust a blank capture:** run `node --check` first; blank SVG areas are script
   errors far more often than paint problems.
 
 ## Field notes (defaults, not laws)
@@ -171,7 +172,7 @@ is fine.
   zero-area boxes and fully-contained pairs (labels inside boxes are
   correct), flags pairwise intersections over 2px. Run at the final step
   (worst case) and after every tab switch. Thresholds (2px, opacity 0.5)
-  are starting points, not tolerances — tune to the figure.
+  are starting points, not tolerances; tune to the figure.
 - Run the audit AFTER render, never before: an init-time audit measures the
   pre-render state and reports a false CLEAN. Identical-position boxes count
   as "contained" and are skipped, so keep titles short enough to fit the
@@ -180,12 +181,12 @@ is fine.
   so rotated groups (e.g. `rotate(45)` pistons, bores) report overlaps their shapes
   never make, and stroke-adjacent elements legitimately touch past 2px. Fix hits
   where a shape escapes its container (flame out of the gas rect, text out of its
-  box) and confirm the rest against the screenshot — a layered engine cross-section
+  box) and confirm the rest against the screenshot: a layered engine cross-section
   can report 20+ hits with nothing visually wrong.
 - Headless captures freeze animation clocks at t=0 (observed): design every
   animated element so its frozen state reads sensibly, and never gate static
   visibility on animation state. In the tested build, `feGaussianBlur`
-  filters suppressed rendering entirely — prefer layered translucent shapes,
+  filters suppressed rendering entirely; prefer layered translucent shapes,
   and verify any filter in the capture pipeline, not just a live browser.
 - **`--window-size` is the window, not the viewport.** Headless Chromium reports an
   `innerHeight` smaller than the requested height, so a scale computed from the window
@@ -202,7 +203,7 @@ is fine.
 
 - `svg-explainer-layout` - Composing the HTML+SVG explainer pages this loop verifies.
 - `svg-fundamentals` - Inline SVG authoring, `viewBox` discipline, pointer conversion.
-- `svg-interaction` - Step state, sliders, scrubbers — the state machine being verified.
+- `svg-interaction` - Step state, sliders, scrubbers: the state machine being verified.
 - `svg-geometry` - Paths, Beziers, markers and dash arrays for the figures under test.
 - `svg-d3-charts` - D3 joins, scales and axes for data-driven cards.
 - `svg-animation` - Timeline-driven SVG animation with a scrubbed playhead.
