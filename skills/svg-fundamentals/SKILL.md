@@ -1,7 +1,7 @@
 ---
 name: svg-fundamentals
 description: "Inline SVG: viewBox, scaling, groups, CSS, pointer coords."
-version: 1.0.0
+version: 1.1.0
 ---
 
 # SVG Fundamentals
@@ -13,6 +13,10 @@ unit scale, the final render size (which sets the minimum cap height in px), and
 text split (what is HTML prose, what is an in-SVG label). `viewBox` numbers are a
 consequence of those decisions. Choosing them first is how a figure ends up with
 labels that read fine at 1200 px and are illegible at 89 mm.
+
+Also bring the view map (one `viewBox` per view, or one shared canvas when views are
+tabs) and the detail level. `detail: full` is the default, so size the canvas for the
+features the inventory lists, not for the first sketch.
 
 ## Quick Start
 
@@ -72,6 +76,20 @@ Width follows the container; the `viewBox` never changes.
 
 - CSS: `svg { width: 100%; height: auto; }` (Distill GP figures use `svg.svelte-1gc1gg1{width:100%;height:auto}`, accessed 2026-10-17).
 - The `viewBox` rectangle is mapped onto the viewport bounds, often with `preserveAspectRatio` (MDN, accessed 2026-10-17).
+
+### Floors in CSS px, not units
+
+Stroke and text floors are met on screen, so convert at the smallest viewport the spec
+names: `px per unit = rendered SVG width / viewBox width`. In one build a 1600x820 canvas
+rendered at about 0.78 px per unit at 1280x720, so 1.25-unit annotation strokes drew under
+1 CSS px; they were raised to 1.5 units, and labels to 18.5 units (about 14 px). Measure
+the scale from `svg.getBoundingClientRect().width`, not from the window size, and assert
+the label floor in px in the audit (see `svg-verify`).
+
+- A full-page figure (`100vw x 100vh`, no scrollbar) gets its scale from the tighter of
+  the two axes; check the floor at the narrowest aspect the spec allows.
+- Raising every class by the same factor keeps the 2:1 outline-to-annotation ratio; raising
+  only the thin lines breaks it.
 
 ## Groups and Transforms
 
