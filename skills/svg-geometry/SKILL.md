@@ -1,6 +1,7 @@
 ---
 name: svg-geometry
-description: SVG geometry: paths, Beziers, markers, connectors, dashes.
+description: "SVG geometry: paths, Beziers, markers, connectors, dashes."
+version: 1.0.0
 ---
 
 # SVG Geometry
@@ -37,12 +38,12 @@ a grammar.
 
 SVG `<path>` data uses single-letter commands (absolute by default; lowercase = relative):
 
-- `M x,y` — move pen to a point (start a new sub-path).
-- `L x,y` — straight line to a point.
-- `H x` / `V y` — horizontal / vertical line (UNVERIFIED against the reports; standard SVG).
-- `C x1,y1 x2,y2 x,y` — cubic Bezier.
-- `Q x1,y1 x,y` — quadratic Bezier.
-- `Z` (or `z`) — close the current sub-path back to its start.
+- `M x,y`: move pen to a point (start a new sub-path).
+- `L x,y`: straight line to a point.
+- `H x` / `V y`: horizontal / vertical line (UNVERIFIED against the reports; standard SVG).
+- `C x1,y1 x2,y2 x,y`: cubic Bezier.
+- `Q x1,y1 x,y`: quadratic Bezier.
+- `Z` (or `z`): close the current sub-path back to its start.
 
 Example polyline-ish path: `d="M10,10 L70,10 L70,55"`.
 
@@ -57,7 +58,7 @@ Example polyline-ish path: `d="M10,10 L70,10 L70,55"`.
 - Define a marker in `<defs>` and attach with `marker-end="url(#id)"` (also `marker-start`, `marker-mid`).
 - Key attributes: `viewBox`, `refX`/`refY` (anchor), `markerWidth`/`markerHeight`, `orient="auto"` so the arrow rotates with the path.
 - SVG.js supports markers as a first-class element: `SVG.Marker` is documented, and markers "can be added to every individual point of a line, polyline, polygon and path", including `start/mid/end` and `orient()` (R4, accessed 2026-10-17).
-- Two.js (0.8.24) does NOT emit markers — its arrowheads are drawn geometry via `Two.makeArrow` (R4, accessed 2026-10-17); use hand-written SVG when arrowheads are required.
+- Two.js (0.8.24) does NOT emit markers; its arrowheads are drawn geometry via `Two.makeArrow` (R4, accessed 2026-10-17); use hand-written SVG when arrowheads are required.
 
 ## Connectors Between Boxes
 
@@ -102,7 +103,7 @@ path.setAttribute('d', d);
 
 ## Field notes (defaults, not laws)
 - When annotation columns threaten to overflow the viewBox, prefer stacking
-  (scores / weights / output top to bottom) over squeezing side-by-side — or
+  (scores / weights / output top to bottom) over squeezing side-by-side, or
   shrink the figure, or split the panel. The principle is budget the
   annotation space up front; the arrangement is yours.
 - Zone swapping (`#pipe.swap #compZone { opacity: 0; }`) is one fix for two

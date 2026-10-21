@@ -1,7 +1,7 @@
 # Dimensioned CAD-style mechanical sections
 
 When a cross-section must read as an engineering drawing rather than a cartoon:
-use real-unit coordinates, dimension lines, centerlines, and material fills —
+use real-unit coordinates, dimension lines, centerlines, and material fills,
 and verify every mechanical joint visually.
 
 ## Real-unit viewBox
@@ -11,7 +11,7 @@ and verify every mechanical joint visually.
   (axis points, seat/pivot positions, port corners) and mirror about the centerline.
 - State the basis in the figure (`SECTION A-A · 1 unit = 1 mm · bore …`) and flag
   simplifications in the caption (splayed valves, one pushrod of a pair shown,
-  trapezoidal lift) — never silently stylize measured-looking numbers.
+  trapezoidal lift); never silently stylize measured-looking numbers.
 
 ## Dimension layer
 
