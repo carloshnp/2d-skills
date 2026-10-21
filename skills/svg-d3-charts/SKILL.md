@@ -1,7 +1,7 @@
 ---
 name: svg-d3-charts
 description: D3 7.9.0 data binding for SVG explainers and charts.
-version: 1.0.0
+version: 1.1.0
 ---
 
 # D3 SVG Charts
@@ -12,7 +12,9 @@ From `illustration-spec` bring the encoding decision, not just the data: which q
 is read off which channel (position on a common scale first, length second, never
 angle, area or hue for the take-home number), whether small multiples share scales
 (they must), and the palette roles. D3 will happily draw an encoding nobody can decode
-accurately; that choice belongs in the spec, section 6.
+accurately; that choice belongs in the spec, section 6. When the series is computed
+from a model (a schedule, a phase diagram, a response curve), bring section 9b as well:
+the chart is part of the mechanism and is checked with it.
 
 D3 7.9.0 renders to real inline SVG DOM: every mark it draws is a node you can select,
 style, transition and listen to. The core API has been **frozen since 2024-03-12** (no 7.10,
@@ -233,6 +235,46 @@ Because the coordinate space is fixed, pointer conversions stay valid at any ren
 If you need to turn a click into a data value, use the `getScreenCTM().inverse()` recipe in
 `svg-interaction` and then `x.invert(...)`.
 
+## Charts Driven by a Model
+
+Some charts have no data file: the series is computed from the same model that drives the
+drawing (stroke schedule against crank angle, force against displacement, a phase diagram
+against temperature). Then the generator is the model, and the chart is a mechanism.
+
+```javascript
+// one model, two views: the drawing and the chart call the same function
+const PERIOD = 720;
+const wrap = (t) => ((t % PERIOD) + PERIOD) % PERIOD;
+
+// intervals that cross the period boundary become two marks with distinct keys
+function bands(cyl) {
+  return STROKES.flatMap(({ name, start, len }) => {
+    const a = wrap(start + phaseOffset(cyl)), b = a + len;
+    return b <= PERIOD
+      ? [{ key: `${cyl}-${name}`, x0: a, x1: b, name }]
+      : [{ key: `${cyl}-${name}`, x0: a, x1: PERIOD, name },
+         { key: `${cyl}-${name}-b`, x0: 0, x1: b - PERIOD, name }];
+  });
+}
+
+svg.selectAll("rect.band")
+  .data(CYLS.flatMap(bands), (d) => d.key)      // the split suffix keeps identity
+  .join("rect").attr("class", (d) => `band ${d.name}`)
+  .attr("x", (d) => x(d.x0)).attr("width", (d) => x(d.x1) - x(d.x0));
+```
+
+- **Compute, do not transcribe.** Series typed in by hand drift from the drawing the first
+  time the model changes; series computed from `phaseOffset` cannot.
+- **Cyclic axes split at the wrap.** An interval from 630 to 810 on a 0 to 720 axis is two
+  marks, 630 to 720 and 0 to 90. Drawn as one, it clips or vanishes. In one engine figure
+  every stroke band was mapped into the period this way, with a `-b` key for the second
+  half.
+- **A state cursor is a derived mark.** The vertical line at the current angle is drawn
+  from the same state the drawing uses, never from its own copy.
+- **Invariants go in 9b and get swept.** For a schedule: each row's segments cover the
+  period exactly once with no gap or overlap; the cursor's value equals the drawing's
+  state; no band or label leaves the plot rect at any state.
+
 ## Choosing a Library
 
 R2's per-library verdicts, for LLM-generated interactive explainers:
@@ -294,6 +336,8 @@ Vega *signals*, which is more indirect than D3 or ECharts.
   `requestAnimationFrame` guard so a drag-resize does not re-layout on every pixel.
 - **Accessibility is free.** Give the root SVG `role="img"` and an `aria-label`, and expose
   data as `<text>` so labels stay searchable and selectable.
+- **Model-driven series.** Generate from the model the drawing uses, split cyclic intervals
+  at the wrap with distinct keys, and sweep the chart's invariants with the mechanism.
 
 ## Field notes (defaults, not laws)
 - MUST: mark ONLY sourced numbers, and state the schematic-vs-measured
