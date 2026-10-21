@@ -1,6 +1,7 @@
 ---
 name: svg-defs
-description: SVG defs boilerplate: markers, gradients, masks, filters.
+description: "SVG defs boilerplate: markers, gradients, masks, filters."
+version: 1.0.0
 ---
 
 # SVG Defs and Reusable Resources
@@ -13,10 +14,10 @@ causation or sequence, never decoration or emphasis, so each marker in `<defs>` 
 map to one declared meaning. Filters are the one place faithful rendering is not
 assumed: `feGaussianBlur` has already broken headless capture here.
 
-`<defs>` holds SVG resources that are not rendered on their own — they paint only when
+`<defs>` holds SVG resources that are not rendered on their own; they paint only when
 referenced by `url(#id)` from an attribute (`fill`, `stroke`, `marker-end`, `clip-path`,
 `mask`, `filter`). This skill is copy-paste boilerplate for the six resource types that
-matter in explainers — markers, gradients, clip paths, masks, filters — plus
+matter in explainers (markers, gradients, clip paths, masks, filters), plus
 `foreignObject` and text elements.
 
 > Scope note: support/availability claims come from the SVG APIs report (R4, accessed
@@ -93,10 +94,10 @@ A `<marker>` is a reusable arrowhead (or dot/tick) attached to path ends and way
   path direction. Attach with `marker-end`, `marker-start`, or `marker-mid` (connector
   geometry lives in `svg-geometry`).
 - **Hand-written: full support.**
-- **SVG.js: full support** — `SVG.Marker` is documented, and markers `"can be added to
+- **SVG.js: full support**: `SVG.Marker` is documented, and markers `"can be added to
   every individual point of a line, polyline, polygon and path"`, with `start/mid/end`
   positioning and `orient()` (R4).
-- **Two.js 0.8.24: missing** — the string `marker` occurs 0 times in the 543 KB published
+- **Two.js 0.8.24: missing**: the string `marker` occurs 0 times in the 543 KB published
   build; arrowheads exist only as drawn geometry via `Two.makeArrow` (R4).
 
 ## Gradients
@@ -118,18 +119,18 @@ A `<marker>` is a reusable arrowhead (or dot/tick) attached to path ends and way
 ```
 
 - Stops go from `offset="0"` to `offset="1"`; `gradientUnits` and the coordinate-space
-  rules (object bounding box vs user space) are standard SVG — **UNVERIFIED** against R4,
+  rules (object bounding box vs user space) are standard SVG; **UNVERIFIED** against R4,
   which confirms only library support.
 - **Hand-written: full support.**
-- **SVG.js: full support** — `draw.gradient('linear'/'radial')`, `stop()`,
+- **SVG.js: full support**: `draw.gradient('linear'/'radial')`, `stop()`,
   `from/to/radius()`, then `fill(gradient)` (R4).
-- **Two.js 0.8.24: supported** — `Two.LinearGradient` / `Two.RadialGradient` / `Two.Stop`,
+- **Two.js 0.8.24: supported**: `Two.LinearGradient` / `Two.RadialGradient` / `Two.Stop`,
   emitted into `<defs>`; the SVG renderer docs describe `"<defs /> to apply gradients,
   patterns, and bitmap imagery"` (R4).
 
 ## clipPath
 
-A clip path gives a **hard edge** — content outside the shape is cut away:
+A clip path gives a **hard edge**, so content outside the shape is cut away:
 
 ```html
 <defs>
@@ -144,16 +145,16 @@ A clip path gives a **hard edge** — content outside the shape is cut away:
 ```
 
 - **Hand-written: full support.**
-- **SVG.js: full support** — `draw.clip()`, `clipWith()`, `unclip()`, multiple children,
+- **SVG.js: full support**: `draw.clip()`, `clipWith()`, `unclip()`, multiple children,
   and `clipper()` are documented (R4).
-- **Two.js 0.8.24: partial** — the renderer creates `<clipPath clip-rule="nonzero">`
+- **Two.js 0.8.24: partial**: the renderer creates `<clipPath clip-rule="nonzero">`
   elements for `Two.Path.clip` shapes, but there is no arbitrary clip-path container class
   (R4).
 
 ## Masks
 
-A mask gives a **soft / alpha edge** — white shows, black hides, greys in between (standard
-luminance masking — **UNVERIFIED** against R4, which confirms only support):
+A mask gives a **soft / alpha edge**: white shows, black hides, greys in between (standard
+luminance masking; **UNVERIFIED** against R4, which confirms only support):
 
 ```html
 <defs>
@@ -167,9 +168,9 @@ luminance masking — **UNVERIFIED** against R4, which confirms only support):
 ```
 
 - **Hand-written: full support.**
-- **SVG.js: full support** — `SVG.Mask` plus `maskWith()` and `unmask()` are documented
+- **SVG.js: full support**: `SVG.Mask` plus `maskWith()` and `unmask()` are documented
   (R4).
-- **Two.js 0.8.24: missing and documented broken** — `Two.Path.mask` is `"currently not
+- **Two.js 0.8.24: missing and documented broken**: `Two.Path.mask` is `"currently not
   working because of SVG spec issues"` and the renderer never emits
   `createElement("mask")` (0 hits in the published build) (R4).
 
@@ -186,17 +187,17 @@ luminance masking — **UNVERIFIED** against R4, which confirms only support):
 ```
 
 - Filter primitives (`feGaussianBlur`, `feColorMatrix`, …) and the filter-region
-  attributes are standard SVG — **UNVERIFIED** against the reports; R4 confirms only
+  attributes are standard SVG; **UNVERIFIED** against the reports; R4 confirms only
   whether `<filter>` elements are emitted/supported at all.
 - **Hand-written: full support.**
-- **SVG.js: partial in core** — there is no Filter element in core; filters are supported
+- **SVG.js: partial in core**: there is no Filter element in core; filters are supported
   via the plugin `svg.filter.js` (listed on the official plugins page) (R4).
-- **Two.js 0.8.24: missing** — `createElement("filter")` and the string `"filter"` have 0
+- **Two.js 0.8.24: missing**: `createElement("filter")` and the string `"filter"` have 0
   hits in the published build, and there is no Filter class in the docs (R4).
 
 ## foreignObject Embedding
 
-`<foreignObject>` lets HTML live inside the SVG — widgets, wrapped prose, third-party
+`<foreignObject>` lets HTML live inside the SVG: widgets, wrapped prose, third-party
 markup:
 
 ```html
@@ -207,15 +208,15 @@ markup:
 </foreignObject>
 ```
 
-- The `xmlns` attribute on the child is standard practice for XML documents —
+- The `xmlns` attribute on the child is standard practice for XML documents,
   **UNVERIFIED** against the reports (R4 confirms only that foreign objects "hold objects
   which are not from the svg namespace").
 - **Hand-written: full support.**
-- **SVG.js: full support** — `SVG.ForeignObject` is documented: `"A foreign object can
+- **SVG.js: full support**: `SVG.ForeignObject` is documented: `"A foreign object can
   hold objects which are not from the svg namespace."` (R4).
-- **Two.js 0.8.24: missing** — 0 occurrences of `foreignObject` in the 543 KB published
+- **Two.js 0.8.24: missing**: 0 occurrences of `foreignObject` in the 543 KB published
   build and no docs entry (R4).
-- Keep plain labels as `<text>` (below) rather than HTML — real SVG text stays searchable
+- Keep plain labels as `<text>` (below) rather than HTML: real SVG text stays searchable
   and selectable; see `svg-fundamentals` for the accessibility rules.
 
 ## Text Elements
@@ -227,14 +228,14 @@ markup:
 ```
 
 - `<tspan>` styles a run inside a `<text>`; `<textPath>` routes text along a path (standard
-  SVG — **UNVERIFIED** against the reports).
+  SVG; **UNVERIFIED** against the reports).
 - **Hand-written: full support.**
-- **SVG.js: full support** — `SVG.Text`, `SVG.TextPath`, and `SVG.Tspan` are all in the
+- **SVG.js: full support**: `SVG.Text`, `SVG.TextPath`, and `SVG.Tspan` are all in the
   documented element list (R4).
-- **Two.js 0.8.24: present** — the docs index lists `Two.Text` (and `Two.Text.dashes.offset`
+- **Two.js 0.8.24: present**: the docs index lists `Two.Text` (and `Two.Text.dashes.offset`
   for animated dashes); R4 did not matrix text, so its exact emitted markup is
   **UNVERIFIED**.
-- Animating text splits? `SplitText does not support SVG <text>.` (R3) — plan around it.
+- Animating text splits? `SplitText does not support SVG <text>.` (R3); plan around it.
 
 ## Support Matrix
 
@@ -250,7 +251,7 @@ SVG; all evidence accessed 2026-10-17):
 | `<filter>` | ❌ missing (0 build hits) | 🟡 plugin `svg.filter.js` only | ✅ |
 | `foreignObject` | ❌ missing (0 build hits) | ✅ `SVG.ForeignObject` | ✅ |
 
-Reading: **hand-written SVG is the ceiling** — everything is available. SVG.js is the
+Reading: **hand-written SVG is the ceiling**; everything is available. SVG.js is the
 full-fidelity imperative option (its only trade is that it edits real SVG DOM directly).
 Two.js drops markers, `foreignObject`, `<mask>`, and filters from its SVG output entirely.
 
@@ -261,14 +262,14 @@ D3/Plot, with SVG.js as the imperative option.** No Two.js skill was planned pre
 because its reduced SVG surface defeats the purpose of going SVG-first.
 
 - Need arrowheads, masks, filters, or HTML-in-SVG from a generator? Check the matrix above
-  first — Two.js cannot emit them, so author those figures by hand or via SVG.js.
-- `snap.svg` is effectively dead (0.5.1 published 2017-02-06; last commit 2022-03-13) — do
+  first: Two.js cannot emit them, so author those figures by hand or via SVG.js.
+- `snap.svg` is effectively dead (0.5.1 published 2017-02-06; last commit 2022-03-13); do
   not reach for it (R4).
 
 ## SVG.js Boilerplate (Imperative Option)
 
 ```javascript
-import { SVG } from "@svgdotjs/svg.js"; // npm i @svgdotjs/svg.js — 3.2.8 (2026-08-04)
+import { SVG } from "@svgdotjs/svg.js"; // npm i @svgdotjs/svg.js, 3.2.8 (2026-08-04)
 
 const draw = SVG().addTo("body").size(400, 240);
 
@@ -293,27 +294,27 @@ Defs-relevant API, all method/class names verified in R4:
 | Filters | plugin `svg.filter.js` (not in core) |
 | Also available | `SVG.Pattern`, `SVG.Use`, `SVG.Style` |
 
-**UNVERIFIED:** argument lists for the methods above, where not quoted verbatim — R4
+**UNVERIFIED:** argument lists for the methods above, where not quoted verbatim; R4
 verified the names and the `SVG()`/`rect()`/`animate()` examples shown, not every
 signature.
 
 Version note: npm `latest` is **3.2.8 (published 2026-08-04)**; the GitHub Releases page
-still shows **3.2.6 (2026-07-17)** as "Latest" — trust npm for the newest publish (R4).
+still shows **3.2.6 (2026-07-17)** as "Latest"; trust npm for the newest publish (R4).
 
 ## Common Patterns
 
 - **One `<defs>` per figure**, at the top of the SVG, referenced with `url(#id)`.
-- **Prefix ids** (`#myfig-arrow`) when several SVGs share a page — colliding ids make every
-  reference resolve to the first match (standard SVG — **UNVERIFIED** against R4).
+- **Prefix ids** (`#myfig-arrow`) when several SVGs share a page: colliding ids make every
+  reference resolve to the first match (standard SVG; **UNVERIFIED** against R4).
 - **Arrowheads** are a marker + `orient="auto"`; the connector curve that carries them is
   in `svg-geometry`.
 - **Pick the resource by edge quality:** gradient = painted fill, `clipPath` = hard cut,
   `mask` = soft/alpha fade.
 - **Generator check first:** before drawing a defs-heavy figure through Two.js, consult the
-  support matrix — its SVG output silently lacks markers, masks, filters, and
+  support matrix; its SVG output silently lacks markers, masks, filters, and
   `foreignObject`.
 - **Keep labels as `<text>`**; reserve `foreignObject` for HTML widgets that SVG cannot
-  express (forms, KaTeX) — see `svg-fundamentals`.
+  express (forms, KaTeX); see `svg-fundamentals`.
 
 ## See Also
 
