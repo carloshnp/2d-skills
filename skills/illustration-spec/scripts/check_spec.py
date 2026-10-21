@@ -7,6 +7,8 @@ Checks
   2. no banned adjectives inside requirement text
   3. counts stated in prose match the tables they describe (elements, colours)
   4. no em or en dashes
+  5. section 9b, when present, states STATE, DATUM, and at least one INV-nn
+     invariant, or says "none"
 
 Usage
   python3 check_spec.py path/to/FIG-XX-NN.md
@@ -53,12 +55,16 @@ def parse_count(token):
 
 
 def find_sections(lines):
-    """Map leading section number to (start, end) line indices."""
+    """Map leading section number to (start, end) line indices.
+
+    Plain sections are keyed by int (7); lettered ones by string ("9b").
+    """
     marks = []
     for i, ln in enumerate(lines):
-        m = re.match(r"^##\s+(\d+)[.\s]", ln)
+        m = re.match(r"^##\s+(\d+)([a-z]?)[.\s]", ln)
         if m:
-            marks.append((int(m.group(1)), i))
+            key = int(m.group(1)) if not m.group(2) else m.group(1) + m.group(2)
+            marks.append((key, i))
     marks.sort(key=lambda pair: pair[1])
     out = {}
     for idx, (num, start) in enumerate(marks):
@@ -181,6 +187,19 @@ def main(path):
     for i, ln in enumerate(lines, start=1):
         if "\u2014" in ln or "\u2013" in ln:
             fails.append("line %d: em or en dash" % i)
+
+    # 5. mechanism section
+    block = sections.get("9b")
+    if block is None:
+        warns.append("no '## 9b. Mechanism and state model': confirm nothing is derived")
+    else:
+        body = "\n".join(lines[block[0] + 1:block[1]])
+        if not re.search(r"^\s*none\b", body, re.I | re.M):
+            for field in ("STATE", "DATUM"):
+                if not re.search(r"^-\s+%s:\s*\S" % field, body, re.M):
+                    fails.append("section 9b has no '- %s:' line with content" % field)
+            if not re.search(r"\bINV-\d+", body):
+                fails.append("section 9b states no INV-nn invariant")
 
     if sections.get(11) is None:
         warns.append("no '## 11. Open questions' section")

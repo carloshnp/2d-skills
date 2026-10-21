@@ -23,7 +23,7 @@ figure gets composed by accident, then decorated.
 
 Two paths:
 
-- **Fast path** (12 questions, minutes). One-off figures you will throw away.
+- **Fast path** (13 questions, minutes). One-off figures you will throw away.
 - **Full path** (the spec below). Anything published, presented, revised, reused, or
   handed to an agent in a later session.
 
@@ -49,7 +49,7 @@ to find out whether an idea is worth drawing.
 
 ## The decision spine
 
-Eight decisions, in this order. Each one narrows the next. Reversing the order is the
+Nine decisions, in this order. Each one narrows the next. Reversing the order is the
 most common cause of an illustration that is beautiful and says nothing.
 
 | # | Decision | Settles |
@@ -60,8 +60,9 @@ most common cause of an illustration that is beautiful and says nothing.
 | 4 | What convention governs | projection, line grammar, scale claims |
 | 5 | How attention is ordered | dominant element, reading path, hierarchy |
 | 6 | How meaning is encoded | value plan, palette roles, redundancy |
-| 7 | What the build contract is | canvas, node budget, text split, steps |
-| 8 | How it will be judged | acceptance tests, reviewer, severity |
+| 7 | How it moves | state variables, datum, derived parts, invariants |
+| 8 | What the build contract is | canvas, node budget, text split, steps |
+| 9 | How it will be judged | acceptance tests, reviewer, severity, state sweep |
 
 ## View map
 
@@ -79,7 +80,7 @@ modules before specifying any of them. The view map is section 6's first table.
 - Views with no dependency between them can be built in parallel, one agent each. The
   view map is the work breakdown for a delegated build.
 
-## Fast path: twelve questions
+## Fast path: thirteen questions
 
 Answer in writing. Each line names what it costs when skipped.
 
@@ -106,12 +107,16 @@ Answer in writing. Each line names what it costs when skipped.
     Skipped: implied claims nobody verified.
 12. **What test will this fail if it is wrong?** Skipped: review by taste, no falsifiable
     criterion.
+13. **What moves, what drives it, and what must stay true at every state?** Skipped: the
+    frame you checked is right and the other states are not. Answer "nothing moves" in
+    writing if that is the answer.
 
 ## Full path: the spec
 
 Copy this block into a file named for the figure (`FIG-03-eutectic.md`), fill it, and
 keep it next to the drawing. Sections 2 to 6 are filled before any sketch exists.
-Section 8 is filled at thumbnail time, section 9 before build, section 10 before review.
+Section 8 is filled at thumbnail time, sections 9 and 9b before build, section 10 before
+review.
 
 ```markdown
 # FIG-<id>: <title>
@@ -195,6 +200,17 @@ balanced, readable (say what makes it so, measurably).
 - ids and classes: DOM ids equal inventory IDs; one class per visual role
 - verification hooks: which state can be forced by query param
 
+## 9b. Mechanism and state model
+Required when any position, visibility, or label is derived from a state.
+Write "none: nothing is derived" when that is true.
+- STATE: <name, unit, range, step, default>, one line per variable
+- DATUM: <what zero means, and for which part>
+- DERIVED: <element ID>: <formula>, one line each; every element not listed is placed
+- CHAIN: <driver> -> <derived> -> <derived>
+- INVARIANTS: INV-01 <statement true at every state>, INV-02 ...
+- SAMPLED STATES: <states reviewed by eye, and why each one>
+- SWEEP: <every value | declared sample of n>, run by <harness path>
+
 ## 10. Acceptance criteria
 | REQ | test | pass condition | method |
 |-----|------|----------------|--------|
@@ -209,6 +225,43 @@ Copy thresholds from the section below, and mark invented ones as invented.
 | rev | date | change | why |
 |-----|------|--------|-----|
 ```
+
+## Mechanism and state model
+
+Almost every interactive figure is a mechanism, and every figure with motion is one: some
+part's position is computed from a state rather than placed. A crank angle drives eight
+pistons, a slider drives a curve, a step index decides which labels exist. One correct
+frame proves nothing about the other states, so the mechanism is planned, defined, and
+reviewed like the composition is.
+
+It is required whenever any position, visibility, or label is derived from a state. That
+includes a static figure frozen at one state: it is one sample of a mechanism, and the
+next revision will ask for a different one. Write it as section 9b, before the build
+contract freezes.
+
+- **State variables.** Name, unit, range, step, default: `crank angle, degrees, 0 to 719,
+  step 1, default 90`. A four-stroke cycle spans 720 degrees, not 360; a range wrong by a
+  factor is the cheapest mechanism bug to make and the most expensive to find late.
+- **Phase datum.** What zero means and for which part: "0 = cylinder 1 at top dead centre
+  of compression". Every other phase is stated once, relative to the datum.
+- **Derived versus placed.** List every element whose geometry comes from a formula, with
+  the formula: piston pin height `r cos(t) + sqrt(L^2 - r^2 sin^2(t))`. Everything not on
+  the list is placed and must not move when the state changes.
+- **Kinematic chain.** Which derived part depends on which: crank, pin, rod, piston. Build
+  order follows the chain, and so does debugging.
+- **Invariants.** Statements true at every state, written so a harness can assert them:
+  "the two rods on one crankpin stay 90 degrees apart", "no piston crown rises above the
+  deck line", "no derived coordinate is NaN", "no label leaves the canvas".
+- **Sampled states.** The few states a reviewer inspects by eye: the datum, one state at
+  each phase boundary, and the worst case for clearance or label collision.
+
+Review is a sweep, not a frame. The harness steps through every value in the range (or a
+declared sample when the range is continuous), asserts every invariant at every step, and
+reports the first failing state. A mechanism checked at one frame is unreviewed.
+
+Static, animated, and interactive versions share one model. Draw the static figure by
+calling the function the slider calls, so the frozen frame and the live one cannot
+disagree. `references/build-harness.md` carries the sweep.
 
 ## Before you present a spec for approval
 
@@ -322,9 +375,11 @@ approves a different class of error, which is why one review cannot replace them
 - **G2 Silhouette and value.** Two-value reduction, then a 3 to 5 value study. Approves
   readability and focal contrast. Failures are rejected here, not fixed in colour.
 - **G3 Rough.** Drawing accuracy, content coverage, labels roughed in. Content freezes
-  at approval; later redesigns are new scope.
+  at approval; later redesigns are new scope. The state model freezes with it: a new
+  state variable after G3 is new scope.
 - **G4 Build.** Line grammar, palette, text placement, steps. Approves craft.
-- **G5 Acceptance.** Section 10 run in full, plus one non-author reviewer.
+- **G5 Acceptance.** Section 10 run in full, the state sweep green for every invariant,
+  plus one non-author reviewer.
 
 For technical figures insert a gate between G3 and G4: **factual accuracy**. No
 professional illustration workflow has this gate, and an explainer without it is
@@ -348,6 +403,8 @@ passes, so the spec has to declare its own threshold. Tier C is hygiene.
 - Alt text: an equivalent purpose, not a description of marks; one or two sentences plus
   a linked data table when the figure carries numbers.
 - Rubric form: each acceptance descriptor lets the maker picture the next action.
+- State sweep (declared local, gate for mechanisms): every invariant in section 9b holds
+  at every swept state, and the first failing state is reported by value.
 
 **Tier B (require, judge):**
 
@@ -441,6 +498,7 @@ No source resolves these, so the spec decides and records the decision:
 | 9 steps and timing | `svg-animation` |
 | 6 encoding, shared scales, small multiples | `svg-d3-charts` |
 | 9 interaction | `svg-interaction` |
+| 9b state model, invariants | `svg-animation`, `svg-interaction`, `svg-verify` |
 | page and panel structure | `svg-explainer-layout` |
 | 10 acceptance, DOM assertions | `svg-verify` |
 
