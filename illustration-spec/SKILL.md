@@ -1,7 +1,7 @@
 ---
 name: illustration-spec
 description: Use when planning a 2D illustration before drawing.
-version: 1.0.0
+version: 1.2.0
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -180,6 +180,107 @@ Copy thresholds from the section below, and mark invented ones as invented.
 |-----|------|--------|-----|
 ```
 
+## Before you present a spec for approval
+
+The document is the deliverable at this stage, so audit it the way you will audit the
+drawing. Four checks, all mechanical, all before anyone reads it:
+
+1. **Traceability.** Every requirement has exactly one acceptance row, and every
+   acceptance row names a requirement. A requirement with no test is not a requirement,
+   and a test with no requirement is scope creep.
+2. **Banned adjectives.** Scan the requirement lines for clear, clean, modern,
+   professional, appealing, balanced, readable. Each one hides a decision nobody made.
+   Replace it with the property that makes it true and the way to check it.
+3. **Derived counts.** Totals written in prose ("twenty-six elements", "five colours",
+   "eight detents") drift the moment a table grows. Count from the table, write the
+   number, and recount after every revision. A stale total is the first thing a reviewer
+   notices and the last thing you remember to fix.
+4. **Claim status.** Every factual claim the figure will assert sits in the accuracy
+   ledger with a status, a source, and, where the source is weak, what would replace it.
+   A claim with no ledger row is a claim that will be drawn from memory.
+
+`scripts/check_spec.py <spec.md>` runs checks 1 to 3 mechanically and exits non-zero on
+any hit. Run it before presenting, not after a reviewer finds the problem.
+
+## Detail views and medium changes
+
+When a revision adds views, the medium changes before the layout does.
+
+- A detail is a magnified portion of a parent view, never a standalone redrawing:
+  chain-thin boundary around the source, a leader that terminates on the feature, and
+  the scale declared in the label (3:1, 2:1).
+- Derive detail geometry from the parent by the scale factor. Redrawing by hand is how a
+  detail and its parent come to disagree about proportions, and it makes dimension
+  checks impossible to run in both.
+- Adding views forces a medium decision: magnified callouts inside the existing panels,
+  or standalone panels on a taller sheet. Decide it explicitly, then update section 2
+  and section 4 together and record what the aspect change costs on a projector. A
+  figure that quietly stops being 16:9 is a figure that stops fitting the slide it was
+  specified for.
+- Three details in one 16:9 sheet is about the practical ceiling before the callouts
+  start competing with the parent view. Past that, move to a taller sheet or split the
+  figure; the number is a declared local judgement, not a standard.
+- **When every view must reach the same detail, give each view its own full-page tab on
+  one shared canvas.** A grid of bands caps what a view can hold: a band grows sideways
+  while detail needs height, so five views on one screen means five reduced drawings.
+  Five tabs on one viewBox means five drawings at the same unit scale, switched by a tab
+  bar that preserves the shared state (crank angle, step, selection) across switches.
+  Keep the tab letters in reading order and put the scale in each tab caption, since no
+  two views are ever seen together and each must stand alone.
+
+## Projection discipline and numbers
+
+Two rules no gate catches, because every element can be present and the drawing still
+wrong.
+
+- **A cylindrical feature is a rectangle when its axis lies in the section plane, and a
+  circle only in an end view.** A journal or crankpin drawn as a circle inside a side
+  section is an end view pasted into a section: it reads as unmechanical even to a reader
+  who cannot name why. Decide per view which features are seen along their axis (circles)
+  and draw every other cylinder as a rectangle with webs and fillets. Write this into the
+  spec as a requirement, because a builder given radii will draw circles.
+- **A dimension label must agree with the drawn geometry at one scale.** Annotate a number
+  only when the distance on the sheet matches the same unit scale as every other dimension
+  on that sheet. A builder asked for detail invents plausible figures: a 300-unit bore
+  spacing labelled 112 mm is a false claim the reader can measure. When the spec forbids
+  real numbers, draw the extension lines and label the quantity ("stroke", "bore
+  spacing") with no value at all. An unsourceable number is worse than no number.
+- **Hidden means hidden, not faint.** A second part at a different depth takes a long dash
+  pattern, a narrower silhouette, and a small axial offset so it never coincides with the
+  near part; drawing it at the same position in a thinner line reads as a duplicate, not
+  as depth.
+
+## Building from the spec with delegated agents
+
+A multi-view figure parallelises by view, not by element. Write the contract first, then
+one agent per view.
+
+1. **Contract file in the build directory** (`INTERFACE.md`): module shape
+   (`window.PANEL_X = {mount(svg), render(state)}`), the shared state the shell owns and
+   every helper it exposes, the CSS class table with palette variables, and one section
+   per view carrying its canvas, its required features, and its label list.
+2. **One module per view plus a standalone test page** that stubs the shared state and
+   renders three states. An agent that can only test inside the integrated page cannot
+   tell whether its own panel works, and will report success from a file that exists.
+3. **Re-steer, do not restart, when the architecture changes mid-build.** Agents already
+   drawing carried the old canvas; send each the new dimensions and the contract path.
+   Restarting loses their verified work and their test page.
+4. **Count descendants, not children,** in any audit: `querySelectorAll("*").length`, not
+   `childElementCount`, or a panel that mounts a single group reads as empty.
+5. **A passing DOM audit is not a correct drawing.** Assert what is checkable, then look
+   at every state. In one build the audit was green while the crank sat in the wrong
+   projection, one panel split its subject across two half-views, and one chart clipped
+   every row.
+6. **A review note is a reason to patch, not to regenerate.** Regenerating a panel from
+   the brief discards the detail that was expensive to draw, and detail is the first
+   thing to vanish. Copy the working file to `panelX.js.old` before touching it, compare
+   `querySelectorAll("*").length` before and after, and treat a drop over ten percent as
+   lost work. Rewrite only when the projection itself is wrong, and then port the old
+   feature list into the new contract line by line rather than writing from memory.
+
+`references/delegated-illustration-build.md` carries the contract template and the fix
+round pattern.
+
 ## Gate list
 
 Gates run in order. Do not raise fidelity until the current gate passes. Each gate
@@ -325,9 +426,21 @@ No source resolves these, so the spec decides and records the decision:
   written before, and its value is in what it forces you to decide early.
 - **Borrowed thresholds.** A pixel value quoted as a standard when it came from one
   company's design system. Name the source and its scope, or mark it local.
+- **Regeneration loss.** A view is rebuilt to answer a review note and comes back
+  simpler: fewer features, fewer labels, less of the detail that made it worth having.
+  The reviewer's complaint was local, the rebuild was global. Fixed by patching the
+  offending geometry in place, keeping a `.old` copy, and counting elements before and
+  after every rewrite.
 
 ## See Also
 
+- `references/technical-sheet-conventions.md` for projection, line grammar, detail
+  callouts, materials labels, and the accuracy ledger format
+- `references/delegated-illustration-build.md` for the contract file, per-view modules
+  and the fix round that follows a visual review
+- `scripts/check_spec.py` for the mechanical pre-presentation audit
 - `svg-explainer-layout` for page structure around figures
 - `svg-verify` for the headless loop that runs Tier A checks mechanically
-- `planning/SYNTHESIS.md` and `planning/P1..P7/` for the evidence behind each rule
+- The research corpus behind each rule lives in the 2d-research workspace, `planning/P1..P7`
+  and `planning/SYNTHESIS.md`. The installed skill carries the distilled rules, not the
+  reports.

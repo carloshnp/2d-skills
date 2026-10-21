@@ -1,6 +1,6 @@
 ---
 name: svg-explainer-layout
-description: HTML+SVG explainer pages: cards, tabs, traces, steps, a11y.
+description: "HTML+SVG explainer pages: cards, tabs, traces, a11y."
 ---
 
 # SVG Explainer Layout
@@ -141,6 +141,29 @@ stays real DOM text.
 - **UNVERIFIED:** tab toggles as a widget (tablist semantics). The verified primitive is
   per-figure state-toggling buttons (Red Blob `id="diagram-early-exit-true"` / `-false`);
   implement tabs as a plain button row toggling one visible pane unless another source is found.
+  The full-page tab layout in the next section is verified by a built headless page, not by
+  a published source.
+
+## Full-page tabs
+
+Use when several views must each reach the same detail: one view per tab, each owning the
+whole viewport, instead of bands that cap how much any one view can hold.
+
+- **Markup:** one `<section role="tabpanel">` per view, each `position:absolute; inset:0`,
+  hidden with `display:none` and shown by a class. A `<div role="tablist">` of
+  `<button role="tab" aria-selected>` in the header, never links.
+- **One canvas per tab, same viewBox.** Every tab's SVG is `width:100%;height:100%` with the
+  same `viewBox`, so one stroke weight and one label floor serve all views. Different
+  viewBoxes per tab quietly change the unit scale and the legibility floor with it.
+- **State lives in the shell, not the tab.** One angle/step variable, one `render(state)`
+  called on every switch as well as on every state change, so a tab reopened at a new
+  angle shows the new angle. Restore the previously active tab after any internal loop.
+- **URL params for every state:** `?tab=C&angle=90&audit=1` makes any tab capturable
+  headlessly; without a `tab` param a verify loop measures the same view five times.
+- **Keys 1..5 and arrow keys.** A tab bar that only responds to the mouse cannot be
+  driven in a demo or by a scripted check.
+- **Caption per tab.** No two views are ever seen together, so each tab carries its own
+  scale and its own reading; a header caption carries only the figure's message.
 
 ## Accessibility and text-first typography
 

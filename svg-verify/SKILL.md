@@ -121,6 +121,29 @@ const t = dom.match(/transform="translate\(([^)]*)\)"/g); // read attribute valu
   x0,y0,x1,y1 --bins …`): mean RGB for color-cast claims, FFT bin magnitudes for
   periodic-structure claims; bins are content-specific (e.g. dash-spacing frequency).
 
+## Auditing a tabbed page
+
+When one page carries several full-page views behind a tab bar, a single audit run only
+measures the visible tab. Loop the matrix and force the tab through a query param.
+
+1. **Activate each tab before measuring, then restore.** A `display:none` section has
+   zero-size boxes, so `getBBox()` and every overlap test return meaningless values. The
+   audit sets `?tab=X`, renders, measures, and returns to the starting tab before the run
+   ends, so the screenshot that follows still shows what the reader sees.
+2. **Assert the routing, not just the content.** A page that ignores `?tab=` returns the
+   same DOM five times and passes the whole matrix. Compare a per-tab signature (element
+   count plus the first `data-k` values) and fail when two tabs match.
+3. **Audit every tab at every state and every viewport.** Five tabs x six angles x three
+   sizes is 90 dumps and runs in under a minute with a script; hand-running it produces a
+   matrix with holes. Write `verify.py` once, print a per-tab table, and exit non-zero on
+   any failure.
+4. **Per-tab content tokens must come from the panel, not from the shell.** A token that
+   also appears in the shell CSS (`hatch`, `pin`) is satisfied by an empty panel. Grep the
+   tab's own DOM for a token only that panel emits.
+5. **PNG size asserts the window, not the layout viewport.** A capture requested at
+   1280x720 is a 1280x720 PNG even though the page laid out at a shorter `innerHeight`;
+   a passing size check says nothing about the scale labels rendered at.
+
 ## Common Patterns
 
 - **Determinism checklist:** HTTP (not `file://`), `?still=1&step=N` honoured before
@@ -164,6 +187,16 @@ is fine.
   visibility on animation state. In the tested build, `feGaussianBlur`
   filters suppressed rendering entirely — prefer layered translucent shapes,
   and verify any filter in the capture pipeline, not just a live browser.
+- **`--window-size` is the window, not the viewport.** Headless Chromium reports an
+  `innerHeight` smaller than the requested height, so a scale computed from the window
+  size overestimates how large labels and strokes render. Compute the scale from
+  `svg.getBoundingClientRect()` against its `viewBox`, and print `innerWidth x innerHeight`
+  in the audit verdict so a floor failure can be read at the size it happened. A label
+  measured at exactly the 11 px floor is usually a float just under it: raise the size at
+  the smallest audited viewport instead of loosening the check.
+- **Element counts: descendants, not children.** `childElementCount` reports 2 for a panel
+  that mounts one `<g>` holding 300 elements. Use `querySelectorAll("*").length`, and
+  prefer semantic selectors over class names invented by a different author.
 
 ## See Also
 
