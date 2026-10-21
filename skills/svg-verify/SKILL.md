@@ -1,7 +1,7 @@
 ---
 name: svg-verify
 description: Headless screenshot verification for SVG explainers.
-version: 1.0.0
+version: 1.1.0
 ---
 
 # SVG Explainer Verification
@@ -12,7 +12,9 @@ Verification starts before the build, because the spec supplies the assertions. 
 `illustration-spec` bring the acceptance criteria table and the inventory IDs: each DOM
 id should equal its inventory ID (VIZ-<ID>) so the state dump asserts the right node,
 and each Tier A gate (contrast, colour-only encoding, at-size legibility) should map to
-one check here. A requirement with no test is not a requirement.
+one check here. A requirement with no test is not a requirement. Two more inputs: the
+view map's element floor per view, and section 9b's state variable and INV-nn lines,
+which become the state sweep.
 
 Adapted from the `threejs-viz-delivery` loop (used for WebGL scenes) to inline-SVG
 explainer pages: serve over HTTP, capture headless Chromium screenshots with
@@ -140,10 +142,74 @@ measures the visible tab. Loop the matrix and force the tab through a query para
    any failure.
 4. **Per-tab content tokens must come from the panel, not from the shell.** A token that
    also appears in the shell CSS (`hatch`, `pin`) is satisfied by an empty panel. Grep the
-   tab's own DOM for a token only that panel emits.
+   tab's own DOM for a token only that panel emits, and take the token list from the build
+   contract (the interface file the panels were written against), not from memory of what
+   a panel probably draws. Even then a token proves the class exists, not that its fill
+   paints: run the paint-server check too.
 5. **PNG size asserts the window, not the layout viewport.** A capture requested at
    1280x720 is a 1280x720 PNG even though the page laid out at a shorter `innerHeight`;
    a passing size check says nothing about the scale labels rendered at.
+
+## Sweeping a mechanism
+
+A figure with a 9b mechanism section is checked at every state, not at the few angles the
+matrix captures. The sweep runs inside the page under `?audit=1`: it steps the state
+variable through its full range at the 9b resolution, calls the same `render(state)` the
+controls call, asserts every INV-nn at each step, and writes the first failing state into
+the audit title. Two invariants hold for every mechanism and need no INV line: no written
+attribute is `NaN` or `Infinity`, and no part leaves the canvas at any state. One load renders all 720 states of a four-stroke cycle in milliseconds;
+720 headless loads take minutes and still miss what falls between the captured angles.
+
+- The matrix (tabs x states x viewports) checks layout; the sweep checks the model. Run
+  both: neither covers the other.
+- A view whose parts move by a rule and has no sweep is unverified, whatever its captures
+  look like. In the V8 build only one of five views had a full sweep.
+- The page audit, element floor, sweep code, driver matrix, and the failure fixtures that
+  prove the harness can fail are in `illustration-spec/references/build-harness.md`.
+
+## Paint servers: references that paint
+
+A token or class check proves a reference exists, not that it paints. A `url(#id)` whose
+first match is duplicated, missing, or inside a `display:none` subtree paints nothing in
+Chromium (see `svg-defs`, Defs across several SVGs). Check it in the page:
+
+```javascript
+// paint-server audit: a visible element whose url(#id) target is duplicated, missing,
+// or inside a display:none subtree paints nothing there (measured in Chromium 154)
+function paintAudit() {
+  const out = [], seen = new Map();
+  document.querySelectorAll("[id]").forEach((e) => seen.set(e.id, (seen.get(e.id) || 0) + 1));
+  for (const [id, n] of seen) if (n > 1) out.push(`DUPID ${id} x${n}`);
+  const shown = (el) => el.closest("svg").getClientRects().length > 0;
+  const props = ["fill", "stroke", "clip-path", "mask", "filter", "marker-start", "marker-mid", "marker-end"];
+  const refs = new Set();
+  document.querySelectorAll("svg *").forEach((e) => {
+    if (!shown(e)) return;                               // hidden users paint nothing anyway
+    const cs = getComputedStyle(e);
+    for (const p of props) {
+      const m = String(cs.getPropertyValue(p)).match(/url\("?#([^")]+)"?\)/);
+      if (m) refs.add(m[1]);
+    }
+  });
+  for (const id of refs) {
+    const t = document.getElementById(id);              // first match: what the renderer uses
+    if (!t) out.push(`NOREF ${id}`);
+    else if (!shown(t)) out.push(`HIDDENDEF ${id}`);
+  }
+  return out;
+}
+```
+
+- **Only visible users count.** Elements in a hidden tab that reference their own hidden
+  defs paint nothing either way; flagging them buries the real fault under false alarms.
+  The first version of this check did exactly that.
+- **Proved against a real defect.** On a five-tab page that injected one hatch pattern into
+  every tab, the check reported `DUPID h45 x5` on every tab and `HIDDENDEF h45` on the one
+  tab that used it, the same tab where a pixel diff found 9,540 changed pixels in the
+  hatched region. With the pattern moved to one visible host, all five tabs came back
+  `PAINT CLEAN`. The harness that shipped that page checked for the `hatch` class and passed.
+- **When in doubt, diff pixels.** Render the view as built and with the suspect defs moved
+  to a visible host; any difference confined to filled regions is a paint fault.
 
 ## Common Patterns
 
@@ -208,3 +274,4 @@ is fine.
 - `svg-d3-charts` - D3 joins, scales and axes for data-driven cards.
 - `svg-animation` - Timeline-driven SVG animation with a scrubbed playhead.
 - `svg-defs` - Reusable `<defs>` boilerplate plus the SVG.js imperative section.
+- `illustration-spec` - its build-harness reference (`illustration-spec/references/build-harness.md`): page audit, sweep, driver, fixtures.
