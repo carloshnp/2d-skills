@@ -63,6 +63,22 @@ most common cause of an illustration that is beautiful and says nothing.
 | 7 | What the build contract is | canvas, node budget, text split, steps |
 | 8 | How it will be judged | acceptance tests, reviewer, severity |
 
+## View map
+
+Name the views before inventorying their elements, the way a software spec names its
+modules before specifying any of them. The view map is section 6's first table.
+
+| view | job in the argument | depends on |
+|---|---|---|
+| A | <what this view proves that no other view can> | none |
+| B | <...> | A |
+
+- A view with no job is deleted, not shrunk into a corner of another view.
+- A view that depends on another is drawn after it, shares its unit scale, and names its
+  parent in the caption, because the reader never sees the two side by side.
+- Views with no dependency between them can be built in parallel, one agent each. The
+  view map is the work breakdown for a delegated build.
+
 ## Fast path: twelve questions
 
 Answer in writing. Each line names what it costs when skipped.
@@ -142,6 +158,11 @@ Then one line: MESSAGE = the sentence a reader should repeat.
 - detail floor: nothing meaningful below <px> at final size
 
 ## 6. Content inventory
+Views first (one row per view, see View map), then elements.
+
+| view | job in the argument | depends on |
+|------|---------------------|------------|
+
 | ID | element | job in the argument | must show | budget | label | convention |
 |----|---------|---------------------|-----------|--------|-------|------------|
 
