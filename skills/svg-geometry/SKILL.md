@@ -1,7 +1,7 @@
 ---
 name: svg-geometry
 description: "SVG geometry: paths, Beziers, markers, connectors, dashes."
-version: 1.0.0
+version: 1.1.0
 ---
 
 # SVG Geometry
@@ -12,7 +12,7 @@ Geometry here serves a composition decided earlier. From `illustration-spec` bri
 annotation budget (maximum labels and leaders), the line weight scale in px with its
 2:1 outline-to-annotation ratio, and the projection (orthographic, isometric at 30/30,
 or flat). Without those, paths and connectors get placed by eye and no two panels share
-a grammar.
+a grammar. For mechanisms, bring section 9b too: derived geometry comes from its formulas.
 
 ## Quick Start
 
@@ -101,6 +101,28 @@ path.setAttribute('d', d);
 - **Dashed connector:** `stroke-dasharray` + `stroke-dashoffset` for emphasis or "in progress".
 - **Annotated path:** use `marker-mid` for waypoints along a line.
 
+## Projection and derived geometry
+
+These hold for any figure that claims to be a section or an orthographic view.
+
+- **MUST: a cylinder whose axis lies in the view plane is a rectangle; it is a circle only
+  in an end view.** A journal or crankpin drawn as a circle in a side section is an end view
+  pasted into a section. Decide per view which features are seen along their axis, and draw
+  every other cylinder as a rectangle with its webs and fillets.
+- **MUST: derived geometry comes from the model.** A piston, rod, or pointer whose position
+  depends on a state is computed by the same function at every state (`illustration-spec`
+  section 9b), never placed by hand at the one state you are looking at.
+- **MUST: hidden means hidden, not faint.** A part behind another takes the hidden dash, a
+  narrower silhouette, and a small offset so it never coincides with the near part. The same
+  shape in a thinner line reads as a duplicate.
+- **Fix projection by patching.** Replace the offending primitive in place and keep every
+  other feature. Regenerating a view to fix one projection error loses the detail around it.
+- Fillets, webs, and shells are drawn at the declared outline weight, not as afterthoughts
+  in the annotation weight; the weight says which lines are the part.
+
+`references/cad-mechanical-sections.md` covers real-unit coordinates, dimension lines,
+centrelines, and material fills for cross-sections.
+
 ## Field notes (defaults, not laws)
 - When annotation columns threaten to overflow the viewBox, prefer stacking
   (scores / weights / output top to bottom) over squeezing side-by-side, or
@@ -115,3 +137,5 @@ path.setAttribute('d', d);
 - `svg-fundamentals` - viewBox, scaling, groups, CSS, pointer conversion
 - `svg-defs` - Markers, gradients, masks and filters that attach to these paths
 - `svg-animation` - GSAP timelines and DrawSVG stroke animation for these paths
+- `illustration-spec` - projection, line grammar, and the mechanism model these paths serve
+- `references/cad-mechanical-sections.md` - engineering cross-section conventions
