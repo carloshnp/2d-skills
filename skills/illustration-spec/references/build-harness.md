@@ -12,7 +12,7 @@ that worked.
 
 | Half | Runs | Checks | Why it lives there |
 |---|---|---|---|
-| page audit | inside the page, when `?audit=1` | element floor, labels, state sweep, invariants | the page has the DOM and the model; one load can render every state |
+| page audit | inside the page, when `?audit=1` | element floor, labels, state sweep, invariants, paint servers | the page has the DOM and the model; one load can render every state |
 | driver | outside, headless browser | matrix of view x viewport x sampled state, routing, screenshots, report | only the outside can change the viewport and see the pixels |
 
 The page reports through `document.title`, which `--dump-dom` returns without any
@@ -38,7 +38,7 @@ function audit(view) {
       fails.push(`off-canvas "${t.textContent}"@${b.x | 0},${b.y | 0}`);
     if (b.height * scale < MIN_LABEL_PX) fails.push(`small "${t.textContent}"`);
   }
-  return fails.concat(sweep(svg));
+  return fails.concat(sweep(svg), paintAudit());   // paintAudit: see svg-verify
 }
 
 function sweep(svg) {
@@ -61,6 +61,11 @@ function sweep(svg) {
   title stays readable and the failure is reproducible with `?angle=437`.
 - **`render` must update, never recreate.** The `nodes changed` check catches a render
   that appends on every call, which passes any single-frame check.
+- **References must paint.** `paintAudit()` (code in `svg-verify`, Paint servers) fails on
+  a duplicated id, a missing `url(#id)` target, or a target inside a `display:none` subtree
+  used by a visible element. Chromium paints nothing in each case. The V8 shell injected
+  one hatch pattern into all five tab SVGs, and tab B shipped with an unhatched section
+  through a 116/116 harness run.
 - **Invariants are functions of the state**, written from section 9b: two rods on one pin
   stay 90 degrees apart, exactly one dial numeral is lit and it names the firing
   cylinder, the pointer clears every numeral, no label overlaps another.
@@ -122,6 +127,7 @@ at pages built to fail and confirm each one does:
 | view one element under its floor | floor fails |
 | render that appends a node per call | `nodes changed` fails |
 | one invariant broken at a single state | `INV-nn@<state>` names that state |
+| pattern id duplicated, first copy in a hidden view | `DUPID` and `HIDDENDEF` fail |
 
 The V8 harness carried the first four; run against the earlier page it scored 110/116 and
 exited 1, which is the evidence it could fail at all.
@@ -131,6 +137,9 @@ exited 1, which is the evidence it could fail at all.
 - **Green audit, wrong drawing.** The harness checks presence, position, and invariants;
   it does not know a crankpin is drawn in the wrong projection. Look at every view at the
   sampled states after the harness passes.
+- **Token present, paint absent.** A class or token check proves an element carries the
+  class, not that its fill renders. Pair every token check on a patterned or clipped
+  feature with the paint-server check, or diff pixels with the defs moved to a visible host.
 - **A floor typed from the finished drawing** tests nothing. Set it from the inventory
   before the build, and raise it only by a spec revision.
 - **Virtual time is not real time.** `--virtual-time-budget` lets timers and fonts settle

@@ -1,7 +1,7 @@
 ---
 name: illustration-spec
 description: Use when planning a 2D illustration before drawing.
-version: 1.3.0
+version: 1.3.1
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
