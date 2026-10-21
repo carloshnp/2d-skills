@@ -16,20 +16,20 @@ means working convention. OPINION means taste, and it must be labelled as such.
 |---|---|---|
 | One dominant element; at least two focal mechanisms | TAUGHT | composition literature |
 | Hierarchy capped at three levels | TAUGHT | composition literature |
-| Value planned before hue: notan, then values, then colour | TAUGHT | painting and concept-art teaching |
+| Value planned before hue: notan, then values, then colour | TAUGHT (notan step PRACTICE) | painting and concept-art teaching |
 | Palette documented as role plus hex, never as swatches | PRACTICE | art bibles, design systems |
-| Projection declared, one convention per sheet, never mixed | STANDARD | ISO 5456-2, ASME Y14.3 |
-| Outline thick, annotation thin, ratio at least 2:1 | STANDARD | ISO 128-2, ASME Y14.2 |
-| Dashed is hidden; chain-thin is centreline; chain with thick ends is a cutting plane | STANDARD | ISO 128-2 |
-| Dimensions once only, outside the outline, readable from the bottom | STANDARD | ISO 129-1 |
-| Hatch at 45 degrees, one angle per part, broken around labels | STANDARD | ISO 128-44 |
-| Capitals, one lettering style, at least 3.5 mm at final size | STANDARD | ISO 3098 |
+| Projection declared, one convention per sheet, never mixed | STANDARD | ISO 5456-2, ASME Y14.3 (scope only, clause not opened); rule text via RoyMech |
+| Outline thick, annotation thin, ratio about 2:1 or more | STANDARD | ASME Y14.2-2008, opened: "approximately two-to-one", 0.3/0.6 mm minima; ISO 128-2 scope only |
+| Dashed is hidden; chain-thin is centreline; chain with thick ends is a cutting plane | STANDARD | ISO 128-2 (scope only, clause not opened); rule text via RoyMech |
+| Dimensions once only, outside the outline, readable from the bottom | STANDARD | ISO 129-1 (scope only, clause not opened); rule text via a university drafting lecture |
+| Hatch at 45 degrees, one angle per part, broken around labels | STANDARD | USPTO 37 CFR 1.84 (open text); ISO 128-44 scope only |
+| Capitals, one lettering style, at least 3.5 mm at final size | STANDARD (one style) / TAUGHT (capitals, 3.5 mm) | ASME Y14.2-2008, opened, for one style; RoyMech for capitals and 3.5 mm (print minima); ISO 3098-1 scope only |
 | Isometric at 30/30/vertical; 0.816 only for registration against orthographic | TAUGHT | technical drawing canons |
 | Axonometric rather than perspective when readers compare sizes or order | PRACTICE | technical illustration |
-| Balloons tied to a parts list; leaders never cross, never point at voids | STANDARD | assembly drawing convention |
-| Position on a common scale is the most accurate encoding; avoid angle, area, hue for the take-home quantity | TAUGHT + EMPIRICAL | Cleveland and McGill, replicated |
-| Delete every element with no teaching job | STANDARD | seductive-details meta-analysis, g = -0.33 overall, -0.43 static |
-| Label on the part, not in a detached legend | STANDARD | spatial contiguity meta-analysis, g = 0.63 |
+| Balloons tied to a parts list; leaders never cross, never point at voids | STANDARD | assembly drawing convention, via a practitioner guide; ASME text not opened |
+| Position on a common scale is the most accurate encoding; avoid angle, area, hue for the take-home quantity | TAUGHT | Cleveland and McGill (1984), replicated |
+| Delete every element with no teaching job | STANDARD | Sundararajan and Adesope (2020) meta-analysis, g = -0.33 overall, -0.43 static |
+| Label on the part, not in a detached legend | STANDARD | Schroeder and Cenkci (2018) meta-analysis, g = 0.63 |
 | Arrows assert movement, transformation, causation, or sequence only | TAUGHT | diagram comprehension research |
 | Stepped statics are the default for causal processes | TAUGHT | animation research |
 | One expertise level per figure; novice scaffolding in a disclosure layer | TAUGHT | expertise-reversal effect |

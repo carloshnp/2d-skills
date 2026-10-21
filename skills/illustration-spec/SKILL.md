@@ -1,7 +1,7 @@
 ---
 name: illustration-spec
 description: Use when planning a 2D illustration before drawing.
-version: 1.3.1
+version: 1.3.2
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -526,8 +526,8 @@ Do not write a blacklisted claim into a spec as a requirement, and say so when a
 
 No source resolves these, so the spec decides and records the decision:
 
-- stroke weight scale in px for screen SVG (standards give print millimetres and a 2:1
-  floor)
+- stroke weight scale in px for screen SVG (standards give print millimetres and a ratio
+  of about 2:1)
 - minimum cap height in px at the final render size
 - maximum annotation or leader count per view
 - minimum gap between leader and its target
