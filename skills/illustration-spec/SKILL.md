@@ -317,7 +317,9 @@ drawing. Four checks, all mechanical, all before anyone reads it:
    A claim with no ledger row is a claim that will be drawn from memory.
 
 `scripts/check_spec.py <spec.md>` runs checks 1 to 3 mechanically and exits non-zero on
-any hit. Run it before presenting, not after a reviewer finds the problem.
+any hit. Run it before presenting, not after a reviewer finds the problem. Its exact
+expectations (requirement line shape, the prose totals it compares, the static section 9b
+workaround) are listed in `references/spec-set-orchestration.md` section 8.
 
 ## Detail views and medium changes
 
@@ -367,10 +369,57 @@ wrong.
   near part; drawing it at the same position in a thinner line reads as a duplicate, not
   as depth.
 
+## Spec sets: one chapter, many figures
+
+A set is not N independent figures. It is one visual system applied N times, and it is
+planned as a set. For a set, read `references/spec-set-orchestration.md` first.
+
+- **One plan file, one roster row per figure.** The row carries the anchor (section id plus
+the sentence the figure follows), the views with their element floors, what the figure must
+show, what it must not show, and its dominant element. Paste the row into a writer's context;
+do not hand over the whole plan to interpret.
+- **Fix shared geometry once.** Any object drawn in two or more figures gets one coordinate
+table in the shared contract, and offsets are translations, never redraws. Otherwise the same
+graph reads as a different graph per figure and the reader cannot carry the layout forward.
+- **One palette, both themes.** Declare a light and a dark hex per role, compute the contrast
+of every pair the figure will use, and turn the consequences into requirements: no text below
+4.5:1, no meaningful stroke in a panel border hue under 3:1, no state encoded by a tint alone.
+- **Verify the facts before writing the brief, not after.** Recompute every number from the
+data structure. A wrong number in the shared brief is replicated once per writer, and each
+writer cites the brief as its source, so no per figure audit can catch it. Where two framings
+of one quantity disagree, choose one and forbid the other in the roster row.
+- **Delegate the writing by figure, audit in waves.** One writer per figure, each running the
+file audit to zero findings before reporting, then a mechanical, a factual, a consistency and
+a coverage pass before any single file is edited.
+- **A per file audit cannot see the set.** Requirement prefixes, palette drift, canvas
+  disagreement and stale anchors are cross file faults: write a set level verifier, and parse
+  its tables by header name because the floor column moves between independently written files.
+- **A green per file audit is not a good figure.** Run four lenses read-only (mechanical,
+  factual, role and geometry consistency, coverage of the argument) before anything is edited.
+  The coverage lens may overrule the mechanical one: a spec can satisfy traceability and still
+  name three parts where the source defines four, or restate the paragraph above it. When that
+  lens proposes adding or cutting a figure, it has found a scope change: route it and record a
+  revision row before dispatching a writer.
+- **When independent writers converge on the same deviation, the brief is wrong.** Three writers
+  painting panel frames at 3.2 and four at 1.0 is a contradiction inside the contract, not seven
+  mistakes: fix the contract line, then the files, or the next wave reproduces it.
+- **A role name is not a role meaning.** The same `success` can end up painting a count, a
+  verified tick, and a settled value in three sheets that all use the right hex. Keep a role to
+  state table in the brief and audit that table across the set, since palette containment and
+  contrast checks cannot see a meaning that changed.
+
 ## Building from the spec with delegated agents
 
-A multi-view figure parallelises by view, not by element. Write the contract first, then
-one agent per view.
+A multi-view figure parallelises by view, not by element; a set of separate sheets
+parallelises by figure. Write the contract first, then one agent per unit.
+
+For a set of static sheets drawn from approved specs, the contract is an SVG shell rather
+than a JS module: root attributes, the role class table with literal hexes, the marker set,
+and `data-view` / `data-el` attributes that let an audit prove every inventory row reached
+the drawing. Render one canary sheet and look at it before dispatching the rest, so an
+interface flaw costs one file instead of N. `references/svg-raster-batch.md` carries the
+shell, the audit checks, and the rasteriser and font traps that decide whether the type
+sizes mean what the specs say.
 
 1. **Contract file in the build directory** (`INTERFACE.md`): module shape
    (`window.PANEL_X = {mount(svg), render(state)}`), the shared state the shell owns and
@@ -568,6 +617,20 @@ No source resolves these, so the spec decides and records the decision:
   The reviewer's complaint was local, the rebuild was global. Fixed by patching the
   offending geometry in place, keeping a `.old` copy, and counting elements before and
   after every rewrite.
+- **Claim the geometry does not support.** A spec asserts an invariant the drawn shape
+  cannot satisfy ("exactly two edges cross the subset ring" when the edge set sends
+  three across it). The builder who measures honestly either redraws to fit a false
+  claim or leaves spec and sheet disagreeing. Fixed by trusting the measurement: patch
+  the spec's claim and its acceptance row to what the geometry does, keep the drawing
+  faithful, and record a revision row saying what changed and why. A spec is a claim to
+  be corrected, not scripture.
+- **Canvas-size legibility.** Type is sized against the canvas (14 px on a 1000 px
+  sheet), then the figure lands in a responsive column and renders far smaller. Fixed
+  by doing the arithmetic before drawing: `effective_px = min_font_px * (column_px /
+  canvas_px)`, and comparing against the legibility floor. A 14 px label on a 1000 px
+  canvas lands near 5 px in a 350 px phone column, which no reader can read. Either
+  author at a narrower canvas with larger type, or accept pinch-zoom and say so in the
+  spec's medium decision; do not discover it after eleven sheets are drawn.
 
 ## See Also
 
@@ -575,6 +638,11 @@ No source resolves these, so the spec decides and records the decision:
   callouts, materials labels, and the accuracy ledger format
 - `references/delegated-illustration-build.md` for the contract file, per-view modules
   and the fix round that follows a visual review
+- `references/svg-raster-batch.md` for drawing a set of standalone SVG sheets: shell, data
+  attributes, set-level SVG audit, canary order, and rasterising with the intended font
+- `references/spec-set-orchestration.md` for a set of specs written by delegated agents:
+  roster row schema, shared geometry, dual theme palette, wave audits, set verifier, and
+  the `check_spec.py` traps
 - `references/build-harness.md` for the page audit, state sweep, driver matrix, and the
   fixtures that prove the harness can fail
 - `references/evidence-and-folklore.md` for every rule with its standing and source, and
@@ -582,6 +650,9 @@ No source resolves these, so the spec decides and records the decision:
 - `references/research-method.md` for how a rule earns its standing, and the change
   control that keeps plans and rules current
 - `scripts/check_spec.py` for the mechanical pre-presentation audit
+- `scripts/svg_bounds_and_type_check.py` for the two static gates a set audit usually
+  misses: elements drawn outside their viewBox, and effective type size at the column
+  width the figure actually lands in (`--column-px 350 --floor 11`)
 - `svg-explainer-layout` for page structure around figures
 - `svg-verify` for the headless loop that runs Tier A checks mechanically
 - The research corpus behind each rule lives in the 2d-research workspace, `planning/P1..P7`,
