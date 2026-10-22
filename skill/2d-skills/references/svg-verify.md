@@ -1,10 +1,6 @@
----
-name: svg-verify
-description: Headless screenshot verification for SVG explainers.
-version: 1.1.0
----
-
 # SVG Explainer Verification
+
+> Subskill of `2d-skills`. Headless screenshot verification for SVG explainers.
 
 ## Before you draw
 
@@ -165,7 +161,7 @@ attribute is `NaN` or `Infinity`, and no part leaves the canvas at any state. On
 - A view whose parts move by a rule and has no sweep is unverified, whatever its captures
   look like. In the V8 build only one of five views had a full sweep.
 - The page audit, element floor, sweep code, driver matrix, and the failure fixtures that
-  prove the harness can fail are in `illustration-spec/references/build-harness.md`.
+  prove the harness can fail are in `references/build-harness.md`.
 
 ## Paint servers: references that paint
 
@@ -274,4 +270,4 @@ is fine.
 - `svg-d3-charts` - D3 joins, scales and axes for data-driven cards.
 - `svg-animation` - Timeline-driven SVG animation with a scrubbed playhead.
 - `svg-defs` - Reusable `<defs>` boilerplate plus the SVG.js imperative section.
-- `illustration-spec` - its build-harness reference (`illustration-spec/references/build-harness.md`): page audit, sweep, driver, fixtures.
+- `illustration-spec` - its build-harness reference (`references/build-harness.md`): page audit, sweep, driver, fixtures.

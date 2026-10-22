@@ -1,10 +1,6 @@
----
-name: svg-fundamentals
-description: "Inline SVG: viewBox, scaling, groups, CSS, pointer coords."
-version: 1.1.0
----
-
 # SVG Fundamentals
+
+> Subskill of `2d-skills`. Inline SVG: viewBox, scaling, groups, CSS, pointer coords.
 
 ## Before you draw
 

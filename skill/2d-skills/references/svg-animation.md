@@ -1,10 +1,6 @@
----
-name: svg-animation
-description: GSAP 3.15 paused timelines for step-through explainers.
-version: 1.1.0
----
-
 # SVG Animation with GSAP
+
+> Subskill of `2d-skills`. GSAP 3.15 paused timelines for step-through explainers.
 
 ## Before you draw
 

@@ -1,10 +1,6 @@
----
-name: svg-explainer-layout
-description: "HTML+SVG explainer pages: cards, tabs, traces, a11y."
-version: 1.1.0
----
-
 # SVG Explainer Layout
+
+> Subskill of `2d-skills`. HTML+SVG explainer pages: cards, tabs, traces, a11y.
 
 ## Before you draw
 

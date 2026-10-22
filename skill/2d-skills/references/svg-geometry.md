@@ -1,10 +1,6 @@
----
-name: svg-geometry
-description: "SVG geometry: paths, Beziers, markers, connectors, dashes."
-version: 1.1.0
----
-
 # SVG Geometry
+
+> Subskill of `2d-skills`. SVG geometry: paths, Beziers, markers, connectors, dashes.
 
 ## Before you draw
 

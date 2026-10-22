@@ -69,7 +69,7 @@ The suite came from two research waves; extend it the same way.
 5. **Synthesis as a dependency spine.** `planning/SYNTHESIS.md` orders decisions by what
    each one needs settled first, and records conflicts and gaps. Gaps become the free
    parameters a spec must declare.
-6. **Map rules back to sources.** `planning/corpus-map.md` lists every rule in the skills
+6. **Map rules back to sources.** `planning/corpus-map.md` lists every rule in this skill
    with the report and source it came from. A rule with no row is either given one or
    demoted to declared local. A report section no rule uses is listed as unused.
 

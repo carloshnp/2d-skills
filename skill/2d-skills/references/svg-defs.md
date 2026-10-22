@@ -1,10 +1,6 @@
----
-name: svg-defs
-description: "SVG defs boilerplate: markers, gradients, masks, filters."
-version: 1.1.0
----
-
 # SVG Defs and Reusable Resources
+
+> Subskill of `2d-skills`. SVG defs boilerplate: markers, gradients, masks, filters.
 
 ## Before you draw
 

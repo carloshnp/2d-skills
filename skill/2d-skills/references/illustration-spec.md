@@ -1,23 +1,11 @@
----
-name: illustration-spec
-description: Use when planning a 2D illustration before drawing.
-version: 1.3.2
-author: Hermes Agent
-license: MIT
-platforms: [linux, macos, windows]
-metadata:
-  hermes:
-    tags: [illustration, planning, spec, composition, technical-drawing, diagram, requirements]
-    category: creative
-    related_skills: [spec-driven-development, svg-explainer-layout, svg-geometry, svg-verify, svg-fundamentals, svg-animation, svg-interaction]
----
-
 # Illustration Spec
+
+> Subskill of `2d-skills`. Use when planning a 2D illustration before drawing.
 
 A drawing discipline borrowed from spec-driven development: write the picture down
 before you draw it, then test the drawing against what you wrote.
 
-The eight `svg-*` skills answer *how* to draw. This one answers *what to decide before
+The eight `svg-*` subskills answer *how* to draw. This one answers *what to decide before
 the first mark*, in the order the decisions depend on each other. Skip it and the
 figure gets composed by accident, then decorated.
 
@@ -34,7 +22,7 @@ Two paths:
 - **Audit the plan:** pre-approval checks, detail views, projection and numbers
 - **Build:** delegated agents, gate list
 - **Judge:** acceptance tests, rules with their standing, folklore, free parameters
-- **Connect:** handoff to the builder skills, failure modes, the SDD mapping, references
+- **Connect:** handoff to the builder subskills, failure modes, the SDD mapping, references
 
 ## When to use
 
@@ -540,9 +528,9 @@ No source resolves these, so the spec decides and records the decision:
 - colour versus hatching for cut material in explainers
 - behaviour at nine or more categorical series
 
-## Handoff to the builder skills
+## Handoff to the builder subskills
 
-| Spec section | Builder skill |
+| Spec section | Builder subskill |
 |---|---|
 | 4 canvas, 9 text split | `svg-fundamentals` |
 | 5 line grammar, 8 composition geometry | `svg-geometry` |
@@ -566,11 +554,9 @@ No source resolves these, so the spec decides and records the decision:
   written before, and its value is in what it forces you to decide early.
 - **Borrowed thresholds.** A pixel value quoted as a standard when it came from one
   company's design system. Name the source and its scope, or mark it local.
-- **Regeneration loss.** A view is rebuilt to answer a review note and comes back
-  simpler: fewer features, fewer labels, less of the detail that made it worth having.
-  The reviewer's complaint was local, the rebuild was global. Fixed by patching the
-  offending geometry in place, keeping a `.old` copy, and counting elements before and
-  after every rewrite.
+- **Regeneration loss.** A view rebuilt to answer a review note comes back simpler. The
+  reviewer's complaint was local, the rebuild was global. Fixed by the patch rule under
+  Building from the spec.
 - **Claim the geometry does not support.** A spec asserts an invariant the drawn shape
   cannot satisfy ("exactly two edges cross the subset ring" when the edge set sends
   three across it). The builder who measures honestly either redraws to fit a false
@@ -607,8 +593,5 @@ No source resolves these, so the spec decides and records the decision:
 - `scripts/svg_bounds_and_type_check.py` for the two static gates a set audit usually
   misses: elements drawn outside their viewBox, and effective type size at the column
   width the figure actually lands in (`--column-px 350 --floor 11`)
-- `svg-explainer-layout` for page structure around figures
-- `svg-verify` for the headless loop that runs Tier A checks mechanically
-- The research corpus behind each rule lives in the 2d-research workspace, `planning/P1..P7`,
-  `planning/SYNTHESIS.md`, and `planning/corpus-map.md` (rule to source). The installed
-  skill carries the distilled rules, not the reports.
+- `svg-explainer-layout` for page structure, `svg-verify` for the headless Tier A loop
+- The router `SKILL.md` for the other subskills and where the research corpus lives

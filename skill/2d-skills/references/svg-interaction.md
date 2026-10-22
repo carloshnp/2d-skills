@@ -1,10 +1,6 @@
----
-name: svg-interaction
-description: "Direct SVG DOM interaction: steps, scrubbers, sliders."
-version: 1.1.0
----
-
 # SVG Interaction
+
+> Subskill of `2d-skills`. Direct SVG DOM interaction: steps, scrubbers, sliders.
 
 ## Before you draw
 

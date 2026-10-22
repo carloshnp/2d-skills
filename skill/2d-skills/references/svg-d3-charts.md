@@ -1,10 +1,6 @@
----
-name: svg-d3-charts
-description: D3 7.9.0 data binding for SVG explainers and charts.
-version: 1.1.0
----
-
 # D3 SVG Charts
+
+> Subskill of `2d-skills`. D3 7.9.0 data binding for SVG explainers and charts.
 
 ## Before you draw
 
