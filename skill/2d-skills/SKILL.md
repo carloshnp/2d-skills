@@ -2,7 +2,7 @@
 name: 2d-skills
 description: Use when planning or drawing 2D SVG figures and explainers.
 version: 2.0.0
-author: Hermes Agent
+author: Carlos Pereira
 license: MIT
 platforms: [linux, macos, windows]
 metadata:
