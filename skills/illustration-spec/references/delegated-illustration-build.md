@@ -42,7 +42,8 @@ Six blocks, in this order. Agents read it first and nothing else.
 - Give the canvas size in the task text as well as in the contract. Agents that only skim
   the file default to the size they saw first.
 - When the architecture changes mid-build, send each running agent a short steer with the
-  new numbers and the sentence "re-read the contract". Do not kill and restart them.
+  new numbers and the sentence "re-read the contract". Do not kill and restart them:
+  restarting loses their verified work and their test page.
 
 ## Review round
 
@@ -56,6 +57,10 @@ defects, not a description:
 - does every leader terminate on the feature it names;
 - is any row, column or segment clipped by the canvas edge;
 - does the dominant element still dominate in grayscale.
+
+A passing audit is not a correct drawing. In one build the audit was green while the crank
+sat in the wrong projection, one panel split its subject across two half-views, and one
+chart clipped every row.
 
 A view that passes the audit and fails this look is usually one or two wrong decisions,
 not a wrong idea, so **patch it by default**. Name the defect and give the geometry: an

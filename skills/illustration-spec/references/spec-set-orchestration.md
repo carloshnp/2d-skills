@@ -104,6 +104,8 @@ no palette containment check can see.
 
 ## 6. Audit in waves, then patch
 
+The lenses are read-only: run all four before anything is edited.
+
 1. **Mechanical:** the per file script on every file, plus the set verifier below.
 2. **Factual:** every occurrence of a quantity, not just the fact table. A writer can flag a
    brief error in an open question and still carry the wrong number into three places (prose, an

@@ -372,41 +372,13 @@ wrong.
 ## Spec sets: one chapter, many figures
 
 A set is not N independent figures. It is one visual system applied N times, and it is
-planned as a set. For a set, read `references/spec-set-orchestration.md` first.
-
-- **One plan file, one roster row per figure.** The row carries the anchor (section id plus
-the sentence the figure follows), the views with their element floors, what the figure must
-show, what it must not show, and its dominant element. Paste the row into a writer's context;
-do not hand over the whole plan to interpret.
-- **Fix shared geometry once.** Any object drawn in two or more figures gets one coordinate
-table in the shared contract, and offsets are translations, never redraws. Otherwise the same
-graph reads as a different graph per figure and the reader cannot carry the layout forward.
-- **One palette, both themes.** Declare a light and a dark hex per role, compute the contrast
-of every pair the figure will use, and turn the consequences into requirements: no text below
-4.5:1, no meaningful stroke in a panel border hue under 3:1, no state encoded by a tint alone.
-- **Verify the facts before writing the brief, not after.** Recompute every number from the
-data structure. A wrong number in the shared brief is replicated once per writer, and each
-writer cites the brief as its source, so no per figure audit can catch it. Where two framings
-of one quantity disagree, choose one and forbid the other in the roster row.
-- **Delegate the writing by figure, audit in waves.** One writer per figure, each running the
-file audit to zero findings before reporting, then a mechanical, a factual, a consistency and
-a coverage pass before any single file is edited.
-- **A per file audit cannot see the set.** Requirement prefixes, palette drift, canvas
-  disagreement and stale anchors are cross file faults: write a set level verifier, and parse
-  its tables by header name because the floor column moves between independently written files.
-- **A green per file audit is not a good figure.** Run four lenses read-only (mechanical,
-  factual, role and geometry consistency, coverage of the argument) before anything is edited.
-  The coverage lens may overrule the mechanical one: a spec can satisfy traceability and still
-  name three parts where the source defines four, or restate the paragraph above it. When that
-  lens proposes adding or cutting a figure, it has found a scope change: route it and record a
-  revision row before dispatching a writer.
-- **When independent writers converge on the same deviation, the brief is wrong.** Three writers
-  painting panel frames at 3.2 and four at 1.0 is a contradiction inside the contract, not seven
-  mistakes: fix the contract line, then the files, or the next wave reproduces it.
-- **A role name is not a role meaning.** The same `success` can end up painting a count, a
-  verified tick, and a settled value in three sheets that all use the right hex. Keep a role to
-  state table in the brief and audit that table across the set, since palette containment and
-  contrast checks cannot see a meaning that changed.
+planned as a set. For a set, read `references/spec-set-orchestration.md` first. It carries
+the roster row schema (section 1), facts recomputed before any writer starts (2), one
+coordinate table for shared geometry (3), one palette in both themes with a role to state
+table (4), dispatch by figure (5), four read-only audit lenses in waves (6), the set level
+verifier (7), the `check_spec.py` traps (8), and the fix wave (9). Two rules hold even
+without it: a per file audit cannot see the set, and when independent writers converge on
+the same deviation, the brief is wrong, not the writers.
 
 ## Building from the spec with delegated agents
 
@@ -421,31 +393,13 @@ interface flaw costs one file instead of N. `references/svg-raster-batch.md` car
 shell, the audit checks, and the rasteriser and font traps that decide whether the type
 sizes mean what the specs say.
 
-1. **Contract file in the build directory** (`INTERFACE.md`): module shape
-   (`window.PANEL_X = {mount(svg), render(state)}`), the shared state the shell owns and
-   every helper it exposes, the CSS class table with palette variables, and one section
-   per view carrying its canvas, its required features, and its label list.
-2. **One module per view plus a standalone test page** that stubs the shared state and
-   renders three states. An agent that can only test inside the integrated page cannot
-   tell whether its own panel works, and will report success from a file that exists.
-3. **Re-steer, do not restart, when the architecture changes mid-build.** Agents already
-   drawing carried the old canvas; send each the new dimensions and the contract path.
-   Restarting loses their verified work and their test page.
-4. **Count descendants, not children,** in any audit: `querySelectorAll("*").length`, not
-   `childElementCount`, or a panel that mounts a single group reads as empty.
-5. **A passing DOM audit is not a correct drawing.** Assert what is checkable, then look
-   at every state. In one build the audit was green while the crank sat in the wrong
-   projection, one panel split its subject across two half-views, and one chart clipped
-   every row.
-6. **A review note is a reason to patch, not to regenerate.** Regenerating a panel from
-   the brief discards the detail that was expensive to draw, and detail is the first
-   thing to vanish. Copy the working file to `panelX.js.old` before touching it, compare
-   `querySelectorAll("*").length` before and after, and treat a drop over ten percent as
-   lost work. Rewrite only when the projection itself is wrong, and then port the old
-   feature list into the new contract line by line rather than writing from memory.
-
-`references/delegated-illustration-build.md` carries the contract template and the fix
-round pattern.
+`references/delegated-illustration-build.md` carries the contract file, one module per
+view with a standalone test page, re-steering running agents instead of restarting them,
+counting descendants rather than children, and why a passing DOM audit is not a correct
+drawing. One rule stays here because it decides whether reviewed work survives: **a review
+note is a reason to patch, not to regenerate.** Copy the file to `panelX.js.old`, compare
+`querySelectorAll("*").length` before and after, and treat a drop over ten percent as lost
+work.
 
 ## Gate list
 
